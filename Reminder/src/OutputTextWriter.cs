@@ -6,7 +6,7 @@ namespace Reminder.src
 {
     class OutputTextWriter
     {
-        public void Welcome(int days, String reminders)
+        public void ShowWelcome() //todo split into two first one ónly logo
         {
             // ASCII text from https://patorjk.com/software/taag/#p=display&h=3&v=0&f=Standard
             Console.WriteLine("==================================================    \n" +
@@ -18,6 +18,11 @@ namespace Reminder.src
                               "=                                                =    \n" +
                               "==================================================    \n");
 
+            
+        }
+
+        public void ShowWelcomeReminders(int days, String reminders)
+        {
             Console.WriteLine("Welcome to Reminder! Here is everything for the next {0}:", FormatTime(days));
             Console.WriteLine(GetUpcomingRemindersRaw(reminders));
         }
@@ -59,6 +64,21 @@ namespace Reminder.src
 
         }
 
+        public void ShowLog(int type)
+        {
+            switch (type)
+            {
+                case 0:
+                    Console.WriteLine("");
+                    break;
+                case 2:
+                    Console.WriteLine("log");
+                    break;
+                default:
+                    return; //add error message but only for development mode not the user in general
+            }
+        }
+
         // shows error messages for the different possible errors caused directly by user input
         public void ShowError(int type)
         {
@@ -66,6 +86,9 @@ namespace Reminder.src
             {
                 case 0:
                     Console.WriteLine("");
+                    break;
+                case 2:
+                    Console.WriteLine("error");
                     break;
                 default:
                     return; //add error message but only for development mode not the user in general

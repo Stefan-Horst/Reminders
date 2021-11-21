@@ -1,0 +1,32 @@
+errorhandler klasse, hauptklasse besitzt ein objekt von ihr, wird an unterklassen übergeben, damit diese darüber an ahuptklasse fehler melden können
+
+
+anforderungen: 
+(- muss schaltjahre berücksichtigen)
+- einmalige termine und welche, die sich wiederholen: tag woche monat jahr individueller intervall
+- expert modus, der fehler und log anzeigt
+- ausgabe in konsole die möglichst schön aussieht
+- einstellbare tage in denen termine in der zukunft bei start der app angezeigt werden
+- option app automatisch zum autostart hinzuzufügen
+- evtl möglichkeit mehrere termin dateien gleichzeitig zu verwalten
+- verschlüsselung der dateien
+- anlegen von terminen so, dass sie für einen tag angezeigt werden oder es zu einer spezifischen uhrzeit ein popup gibt
+- config datei: custom path, autostart, 
+- option zwischen 12 und 24h tag umzustellen
+- erinnerungen die (ab einem bestimmten datum) permanent bestehen bis sie gelöscht werden
+- zeitlose notizen (einfach datum sofort und immer wiederholen)
+- shortcuts beim speichern zB statt datum von morgen einfach tomorrow schreiben können oder 3d, 2w etc.
+- beim start bzw willkommensnachricht auch aktuelles datum und evtl weitere interessante infos anzeigen
+
+- cmdexe und remindermgr sollen gleiches textwriter objekt haben, dadurch können darin für alle outputs globale werte festgelegt werden, diese müssten stattdessen sonst immer in der jeweiligen methode übergeben werden (evtl braucht filemgr auch noch textwriter oder remindermgr übernimmt für filemgr)
+	soll textwriter schon im program erstellt und an cmdexe übergeben werden oder erst in cmdexe erstellt werden?
+- nicht ideal dass program und cmdexe beide einen/den remindermgr benötigen, keine möglichkeit dass nur eins von beiden ihn benötigt? ansonsten vielleicht nicht so schlimm wenn remindermgr in program erstellt wird und nur an cmdexe übergeben wird
+- cmdexe könnte auch direkt im program gemacht werden, die klasse würde wegfallen und die architektur wäre einfacher, dafür program überladen und unmodular
+
+
+als memo text termin und uhrzeit dessen, einzige für system relevante uhrzeit ist die wann memo aktiviert werden soll
+
+program spielt willkommenstext ab über writer und ässt dann über filemgr config laden, falls das nicht geht gibt filemgr rückmeldung an program welches den nutzer fragt ob neue stnadr config erstellt werden soll und beauftragt filemgr in diesem falle wieder mit erstellung dieser, danach das ggleiche für data
+
+
+
