@@ -80,7 +80,7 @@ namespace Reminder.src
         }
 
         // shows error messages for the different possible errors caused directly by user input
-        public void ShowError(int type)
+        public void ShowError(int type, string info)
         {
             switch (type)
             {
@@ -88,13 +88,17 @@ namespace Reminder.src
                     Console.WriteLine("");
                     break;
                 case 2:
-                    Console.WriteLine("error");
+                    Console.WriteLine("error" + info);
                     break;
                 default:
                     return; //add error message but only for development mode not the user in general
             }
         }
 
+        public void ShowHelp()
+        {
+            Console.WriteLine("todo help");
+        }
 
         // converts amount of days in weeks or months if possible
         private String FormatTime(int days)
