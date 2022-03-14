@@ -8,7 +8,7 @@ anforderungen:
 - ausgabe in konsole die möglichst schön aussieht
 - einstellbare tage in denen termine in der zukunft bei start der app angezeigt werden
 - option app automatisch zum autostart hinzuzufügen
-- evtl möglichkeit mehrere termin dateien gleichzeitig zu verwalten
+- evtl möglichkeit mehrere termin dateien gleichzeitig zu verwalten oder kpoien/backups zu erstellen
 - verschlüsselung der dateien
 - anlegen von terminen so, dass sie für einen tag angezeigt werden oder es zu einer spezifischen uhrzeit ein popup gibt
 - config datei: custom path, autostart, 
@@ -29,4 +29,6 @@ als memo text termin und uhrzeit dessen, einzige für system relevante uhrzeit i
 program spielt willkommenstext ab über writer und ässt dann über filemgr config laden, falls das nicht geht gibt filemgr rückmeldung an program welches den nutzer fragt ob neue stnadr config erstellt werden soll und beauftragt filemgr in diesem falle wieder mit erstellung dieser, danach das ggleiche für data
 
 
-
+methode die reminder eines bestimmtes datums abruft
+wenn reminder offen ist fortlaufender thread etc der bei gerade aufkommenden remindern aktualisiert
+beim starten von app verpasste reminder seit letzten start anzeigen

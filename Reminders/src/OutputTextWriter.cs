@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Reminder.src
+namespace Reminders.src
 {
     class OutputTextWriter
     {
         public void ShowWelcome() //todo split into two first one ónly logo
         {
             // ASCII text from https://patorjk.com/software/taag/#p=display&h=3&v=0&f=Standard
-            Console.WriteLine("==================================================    \n" +
-                              "=   ____                _           _            =    \n" +
-                              "=  |  _ \\ ___ _ __ ___ (_)_ __   __| | ___ _ __  =   \n" +
-                              "=  | |_) / _ | '_ ` _ \\| | '_ \\ / _` |/ _ | '__| =  \n" +
-                              "=  |  _ |  __| | | | | | | | | | (_| |  __| |    =    \n" +
-                              "=  |_| \\_\\___|_| |_| |_|_|_| |_|\\__,_|\\___|_|    =\n" +
-                              "=                                                =    \n" +
-                              "==================================================    \n");
+            Console.WriteLine("===================================================    \n" +
+                              "=   ____                _           _             =    \n" +
+                              "=  |  _ \\ ___ _ __ ___ (_)_ __   __| | ___ _ __   =   \n" +
+                              "=  | |_) / _ | '_ ` _ \\| | '_ \\ / _` |/ _ | '__|  =  \n" +
+                              "=  |  _ |  __| | | | | | | | | | (_| |  __| |     =    \n" +
+                              "=  |_| \\_\\___|_| |_| |_|_|_| |_|\\__,_|\\___|_|     =\n" +
+                              "=                                                 =    \n" +
+                              "===================================================    \n");
 
             
         }
@@ -82,6 +82,7 @@ namespace Reminder.src
         // shows error messages for the different possible errors caused directly by user input
         public void ShowError(int type, string info)
         {
+            Console.WriteLine("ERROR");
             switch (type)
             {
                 case 0:

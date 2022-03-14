@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Reminder.src
+namespace Reminders.src
 {
     //taking the commands from the cmd and delegating logic to remindermanager and output to outputtextwriter
     // problem: remindermanager has some standalone tasks like the welcome message at program start, should it be called from here (not fitting) or separately from main

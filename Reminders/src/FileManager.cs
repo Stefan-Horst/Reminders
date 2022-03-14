@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Reminder.src
+namespace Reminders.src
 {
     class FileManager
     {
@@ -35,11 +35,11 @@ namespace Reminder.src
         private void Init()
         {
             if (! LoadConfig())
-                writer.ShowError(2);
+                writer.ShowError(2, "");
             //give option to reset config
 
             if (! LoadData())
-                writer.ShowError(3);
+                writer.ShowError(3, "");
         }
 
         // loads config file and applies the settings

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Reminder.src
+namespace Reminders.src
 {
     class Program
     {
@@ -46,6 +46,18 @@ namespace Reminder.src
             
 
             Console.WriteLine("--------------------------------------------\n");
+            reminderMgr = new ReminderManager(writer);
+            try {
+                //reminderMgr.ReadReminder(999);
+                reminderMgr.GetRemainingTime(999);
+            }
+            catch (Exception e) { Console.WriteLine(e.GetBaseException()); }
+
+            DateTime d = new DateTime(1000);
+            DateTime f = new DateTime(2000);
+
+            Console.WriteLine(d.ToShortDateString());
+            Console.WriteLine(d.Subtract(f).Ticks);
         }
     }
 }

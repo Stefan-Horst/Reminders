@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Reminder.src
+namespace Reminders.src
 {
     class Reminder
     {
@@ -10,14 +10,16 @@ namespace Reminder.src
         private string dateString;
         private DateTime date;
         private int repeat; //interval in days,user can enter w or y which gets converted to amount of days, problem with months and leap years, maybe use -1 and -2 to handle special cases
+        private int id;
 
         public Reminder(string dateString, int repeat, string content)
         {
             this.dateString = dateString;
             this.repeat = repeat;
             this.content = content;
+            id = -1; //default id, must be set to unique id
 
-            ConvertStringToDate();
+            ConvertStringToDate(); //todo check for right format of string
         }
 
         public void ConvertStringToDate()
@@ -48,5 +50,7 @@ namespace Reminder.src
 
         public int Repeat { get => repeat; set => repeat = value; }
         public DateTime Date { get => date; set => date = value; }
+
+        public int Id { get; set; }
     }
 }

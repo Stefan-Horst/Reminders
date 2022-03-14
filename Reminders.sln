@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reminder", "Reminder\Reminder.csproj", "{56738BC7-2034-407D-B511-147F8C6E20DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reminders", "Reminders\Reminders.csproj", "{56738BC7-2034-407D-B511-147F8C6E20DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reminders.UnitTests", "Reminders.UnitTests\Reminders.UnitTests.csproj", "{2C1C189F-B410-4486-8F44-0DB28C63926A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{56738BC7-2034-407D-B511-147F8C6E20DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56738BC7-2034-407D-B511-147F8C6E20DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56738BC7-2034-407D-B511-147F8C6E20DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C1C189F-B410-4486-8F44-0DB28C63926A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C1C189F-B410-4486-8F44-0DB28C63926A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C1C189F-B410-4486-8F44-0DB28C63926A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C1C189F-B410-4486-8F44-0DB28C63926A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
