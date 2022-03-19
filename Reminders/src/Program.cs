@@ -58,6 +58,14 @@ namespace Reminders.src
 
             Console.WriteLine(d.ToShortDateString());
             Console.WriteLine(d.Subtract(f).Ticks);
+
+            //TimeSpan expected = new DateTime(2040, 12, 20).Subtract(DateTime.Now);
+            TimeSpan expected = new DateTime(2040, 12, 20).Subtract(new DateTime(2040, 12, 20));
+            string se = expected.ToString(@"d\.hh\:mm\:ss");
+            Console.WriteLine(se);
+
+            TimeSpan ts = new TimeSpan(-1);
+            Console.WriteLine(ts.ToString());
         }
     }
 }

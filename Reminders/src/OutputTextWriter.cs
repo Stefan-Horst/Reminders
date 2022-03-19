@@ -109,7 +109,7 @@ namespace Reminders.src
             if (days % 7 == 0)
             {
                 if (days / 7 > 1)
-                    s = days / 7 + "weeks";
+                    s = days / 7 + " weeks";
                 else
                     s = "week";
             }
@@ -117,16 +117,16 @@ namespace Reminders.src
             else if (days % 30 == 0)
             {
                 if (days / 30 > 1)
-                    s = days / 30 + "months";
+                    s = days / 30 + " months";
                 else
                     s = "month";
             }
             else
             {
                 if (days > 1)
-                    s = days + "days";
+                    s = days + " days";
                 else
-                    s = "days";
+                    s = "day";
             }
 
             return s;

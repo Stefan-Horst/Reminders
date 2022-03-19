@@ -32,31 +32,33 @@ namespace Reminders.src
             }
         }
 
-        public void GetRemindersDueOnDate(DateTime date)
+        public List<Reminder> GetRemindersDueOnDate(DateTime date)
         {
-            GetRemindersDueinTimespan(date, date);
+            return GetRemindersDueinTimespan(date, date);
         }
 
         public List<Reminder> GetRemindersDueinTimespan(DateTime start, DateTime end)
         {
-            if(start.ToShortDateString() == end.ToShortDateString()) //compares if both are on the same day (date without time)
+            /*if(start.ToShortDateString() == end.ToShortDateString()) //compares if both are on the same day (date without time)
             {
                 return GetDueReminders(end);
             }
             else
-            {
+            {*/
                 List<Reminder> rmndrs = new List<Reminder>();
-
+            
                 foreach (Reminder r in reminders)
                 {   //first checks if r will be due not after the end date, then checks if r will be due after the start date
-                    if (GetRemainingTime(r.Id, end.Date).Equals(DateTime.MinValue) && GetRemainingTime(r.Id, start.Date) > DateTime.MinValue)
+                //Console.WriteLine(r.Date.ToLongTimeString()+" "+end.ToLongTimeString());
+                //Console.WriteLine(GetRemainingTime(r.Id, end.Date) + " " + GetRemainingTime(r.Id, start.Date));
+                    if (GetRemainingTime(r.Id, end) <= TimeSpan.Zero && GetRemainingTime(r.Id, start) >= TimeSpan.Zero)
                     {
                         rmndrs.Add(r);
                     }
                 }
 
                 return rmndrs;
-            }
+            //}
         }
 
         // checks if any reminders are due at a certain date and returns them
@@ -67,7 +69,7 @@ namespace Reminders.src
 
             foreach(Reminder r in reminders)
             {
-                if(GetRemainingTime(r.Id, dueDate).Equals(DateTime.MinValue))
+                if(GetRemainingTime(r.Id, dueDate) <= TimeSpan.Zero)
                 {
                     rmndrs.Add(r);
                 }
@@ -76,11 +78,13 @@ namespace Reminders.src
             return rmndrs;
         }
 
-        public DateTime GetRemainingTime(int id)
+        public TimeSpan GetRemainingTime(int id)
         {
-            DateTime dt = ReadReminder(id).Date;
+            return GetRemainingTime(id, DateTime.Now);
+
+            /*DateTime dt = ReadReminder(id).Date;
             
-            if (dt.CompareTo(DateTime.Now) < 0)
+            if (dt.CompareTo(DateTime.Now) > 0)
             {
                 dt.Subtract(DateTime.Now);
                 return dt;
@@ -89,23 +93,15 @@ namespace Reminders.src
             {
                 Console.WriteLine("no remaining time"); //todo use outputwriter
                 return new DateTime(); //equals 01/01/0001 00:00:00 (0 ticks), reminder is either exactly due or overdue
-            }
+            }*/
         }
 
-        public DateTime GetRemainingTime(int id, DateTime dateToCompare)
+        //returns positive value for remaining time, 0 for exactly due r and negative value for overdue r
+        public TimeSpan GetRemainingTime(int id, DateTime dateToCompare)
         {
             DateTime dt = ReadReminder(id).Date;
-
-            if (dt.CompareTo(dateToCompare) < 0)
-            {
-                dt.Subtract(dateToCompare);
-                return dt;
-            }
-            else
-            {
-                Console.WriteLine("no remaining time"); //todo use outputwriter
-                return new DateTime(); //equals 01/01/0001 00:00:00 (0 ticks), reminder is either exactly due or overdue
-            }
+            Console.WriteLine(dt.ToString()+"-"+dateToCompare.ToString()+"="+dt.Subtract(dateToCompare));
+            return dt.Subtract(dateToCompare);
         }
 
         public Reminder ReadReminder(int id)
