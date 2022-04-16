@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,8 +14,9 @@ namespace Reminders.src
         private static ReminderManager reminderMgr;
         private static CommandExecutor cmdExec;
         private static Queue<string> outputTextQueue = new Queue<string>();
+        private static bool breakFlag = false;
 
-        static void Main(string[] args)
+        public static void Main()
         {
             Test();
 
@@ -35,6 +35,10 @@ namespace Reminders.src
 
         public static void Init()
         {
+            DisableQuickEdit dqe = new DisableQuickEdit();
+            if (!dqe.Disable())
+                writer.ShowError(0, ""); //TODO give user info that console wont get updated if he clicks anywhere in it
+
             reminderMgr = new ReminderManager(writer);
             cmdExec = new CommandExecutor(writer, reminderMgr);
 
@@ -45,6 +49,9 @@ namespace Reminders.src
 
         public static void Test() //method only temporary
         {
+            DisableQuickEdit dqe = new DisableQuickEdit();
+            Console.WriteLine(dqe.Disable());
+
             //C:\Users\Stefan\Desktop\DesktopStuff\CSharp\Reminder\Reminder\bin\Debug\netcoreapp2.1\
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
             Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
@@ -86,10 +93,10 @@ namespace Reminders.src
             nw.Display("test 1 test 2 test 3 test 4");
             Console.WriteLine("MSG CLOSED"); //is only displayed after msgbox is closed NOTIFY USER OF MSGBOX IN CONSOLE THEN DEL MSG IN CMD AFTER CLOSE OF MSGBOX
 
-            while (true) //main loop
-            {
+            while (true) //main loop (test)
+            {               
                 string s = Console.ReadLine();
-                Console.WriteLine(s);
+                PrintText(s);
 
                 /*if(Console.ReadKey().Key == ConsoleKey.Backspace)
                 {
@@ -105,22 +112,25 @@ namespace Reminders.src
         {
             int timeoutCount = 0;
             int posX, posY; // cursor position in console
-
+            bool clearFlag = false;
+            
             while (true)
             {
                 posY = Console.CursorTop;
                 while (Console.CursorLeft != 0 || Console.CursorTop != posY) // wait until timeout after user types input
                 {
+                    clearFlag = true;
+                    
                     posX = Console.CursorLeft;
                     
                     Thread.Sleep(TimeOneSecond); // 1s * IdleTimeoutValue = time until timeout
                     timeoutCount++;
-
+                    
                     if (posX != Console.CursorLeft)
                     {
                         timeoutCount = 0;
                     }
-                    else if (timeoutCount == IdleTimeoutValue)
+                    else if (timeoutCount == IdleTimeoutValue || breakFlag == true)
                     {
                         timeoutCount = 0;
                         break;
@@ -128,21 +138,29 @@ namespace Reminders.src
                 }
                 
                 // clear typed but unentered user input (takes into account multiple lines of user input)
-                int n = Console.CursorTop + 1;
-                Console.CursorLeft = 0;
-                Console.CursorTop = posY;
-                for (int i = posY; i < n; i++)
+                if (clearFlag == true || breakFlag == true)
                 {
-                    Console.Write(new string(' ', Console.WindowWidth));
+                    //record pos of cursor and remove that much when real inpout is entered next time in front of it (also maybe record backspaces then so not too much is deleted; maybe other way by remebering )
+
+                    int n = Console.CursorTop + 1;
+                    Console.CursorLeft = 0;
+                    Console.CursorTop = posY;
+                    for (int i = posY; i < n; i++)
+                    {
+                       Console.Write(new string(' ', Console.WindowWidth));
+                    }
+                    Console.CursorLeft = 0;
+                    Console.CursorTop = posY;
+
+                    clearFlag = false;
+                    breakFlag = false;
                 }
-                Console.CursorLeft = 0;
-                Console.CursorTop = posY;
 
                 Console.WriteLine("output xxx xxx"); //delete later
-
+                
                 while (outputTextQueue.Count > 0)
                 {
-                    Console.WriteLine(outputTextQueue.Dequeue());
+                    Console.WriteLine(outputTextQueue.Dequeue()); //will reminders be printed here or also be enqueued?
                 }   
 
                 // wait 1s after each idle check followed by printing messages received in meantime -> wait time between message prints basically 1s
@@ -153,6 +171,7 @@ namespace Reminders.src
         public static void PrintText(string text)
         {
             outputTextQueue.Enqueue(text);
+            breakFlag = true;
         }
     }
 }
