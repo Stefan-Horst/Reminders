@@ -94,6 +94,7 @@ namespace Reminders.src
             nw.Display("test 1 test 2 test 3 test 4");*/
             Console.WriteLine("MSG CLOSED"); //is only displayed after msgbox is closed NOTIFY USER OF MSGBOX IN CONSOLE THEN DEL MSG IN CMD AFTER CLOSE OF MSGBOX
             //string s = Console.ReadLine();
+
             while (true) //main loop (test)
             {
                 int cursorYInit = Console.CursorTop;
@@ -101,15 +102,20 @@ namespace Reminders.src
                 int cursorXOffset = Console.CursorLeft; // normally 0, but not if there is a prompt before input
                 bool lineFlag = false; // signals when cursor is at first pos of line
 
+                string prompt = "> test: ";
+                Console.Write(prompt);
+                cursorXOffset = prompt.Length;
+
                 ConsoleKeyInfo cki = Console.ReadKey();
                 while (cki.Key != ConsoleKey.Enter)
                 {
                     int X = Console.CursorLeft;
                     int Y = Console.CursorTop;
                     int l = cmdInput.Length; //3 vars only for debug del later
+
                     if (cki.Key == ConsoleKey.Backspace) // nested if so that backspace does not get added to cmdinput in else-part of statement
                     {
-                        if (cmdInput.Length > 0)
+                        if (/*cmdInput.Length > 0*/Console.CursorLeft > cursorXOffset - 1 || Console.CursorTop > cursorYInit)
                         {
                             // only go to row above when current row is empty (otherwise would already happen when first char in row is deleted, because cursor is at posx=0 after deletion)
                             if (Console.CursorLeft == 0 && Console.CursorTop > cursorYInit && (cmdInput.Length + cursorXOffset) % Console.BufferWidth == 0)
@@ -143,8 +149,8 @@ namespace Reminders.src
                                 //{
                                     Console.Write(cmdInput.ToString(cursorXTotal, cmdInput.Length - cursorXTotal) + " \b");
                                 //Console.CursorTop = tempPosY;
-                                    Console.CursorTop = cursorYInit + cursorXTotal / Console.BufferWidth; // '/' discards remainder
-                                    Console.CursorLeft = cursorXTotal % Console.BufferWidth;
+                                    Console.CursorTop = cursorYInit + (cursorXTotal + cursorXOffset) / Console.BufferWidth; // '/' discards remainder
+                                    Console.CursorLeft = (cursorXTotal + cursorXOffset) % Console.BufferWidth;
                                 //}
 
                             }
@@ -153,6 +159,10 @@ namespace Reminders.src
                                 lineFlag = true;
                             else
                                 lineFlag = false;*/
+                        }
+                        else if (Console.CursorLeft != 0)
+                        {
+                            Console.CursorLeft++;
                         }
                     }
                     else if (cki.Key == ConsoleKey.LeftArrow) //add if input goes over multiple rows
@@ -163,7 +173,7 @@ namespace Reminders.src
                             Console.CursorLeft = Console.BufferWidth - 1;
                             cursorXTotal--;
                         }
-                        else if (Console.CursorLeft > cursorXOffset)
+                        else if (Console.CursorLeft > cursorXOffset || Console.CursorTop > cursorYInit)
                         {
                             Console.CursorLeft--;
                             cursorXTotal--;
@@ -176,7 +186,7 @@ namespace Reminders.src
                     }
                     else if (cki.Key == ConsoleKey.RightArrow) // nested if so that right arrow does not get added to cmdinput in else-part
                     {
-                        if (Console.CursorLeft < cmdInput.Length - (Console.CursorTop - cursorYInit) * Console.BufferWidth) // cursor can not exeed length of input
+                        if (Console.CursorLeft - cursorXOffset < cmdInput.Length - (Console.CursorTop - cursorYInit) * Console.BufferWidth) // cursor can not exeed length of input
                         {
                             if (Console.CursorLeft == Console.BufferWidth - 1)
                             {
@@ -215,13 +225,17 @@ namespace Reminders.src
                     {
 
                     }
-                    else if (cki.Key == ConsoleKey.Escape) //entf key
+                    else if (cki.Key == ConsoleKey.Escape)
                     {
                         //del all input
                     }
                     else if (cki.Key == ConsoleKey.Tab)
                     {
                         //just ignore for now / prevent user tabbing
+                    }
+                    else if (cki.Key == ConsoleKey.Insert)
+                    {
+                        //just ignore for now / mode switching not really necessary
                     }*/
                     else
                     {
@@ -229,7 +243,7 @@ namespace Reminders.src
                         {
                             cmdInput.Append(cki.KeyChar);
 
-                            if (cursorXTotal % Console.BufferWidth == Console.BufferWidth -1)
+                            if (cursorXTotal % Console.BufferWidth + cursorXOffset == Console.BufferWidth -1)
                             {
                                 Console.CursorTop++;
                                 Console.CursorLeft = 0;
@@ -243,16 +257,16 @@ namespace Reminders.src
                             int tempPosY = Console.CursorTop;
                             Console.Write(cmdInput.ToString(cursorXTotal + 1, cmdInput.Length - cursorXTotal - 1)); // move text after insertion one to the right
                             
-                            if (/*cursorXTotal + 1 == Console.BufferWidth*/cursorXTotal % Console.BufferWidth == Console.BufferWidth - 1)
+                            if (/*cursorXTotal + 1 == Console.BufferWidth*/(cursorXTotal + cursorXOffset) % Console.BufferWidth  == Console.BufferWidth - 1)
                             {
                                 Console.CursorTop = tempPosY + 1;
                                 Console.CursorLeft = 0;
-                                lineFlag = true;
+                                /*lineFlag = true;*/
                             }
                             else
                             {
                                 Console.CursorTop = tempPosY;
-                                Console.CursorLeft = cursorXTotal % Console.BufferWidth + 1;
+                                Console.CursorLeft = (cursorXTotal + cursorXOffset) % Console.BufferWidth + 1;
                             }
                             
                         }
