@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Reminders.src
 {
@@ -126,6 +125,7 @@ namespace Reminders.src
             if(i != -1) //value equals -1 if no index found
             {
                 reminders.RemoveAt(i);
+                fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
                 //return true;
             }
             else
@@ -143,6 +143,7 @@ namespace Reminders.src
             if (i != -1) //value equals -1 if no index found
             {
                 reminders[i] = reminder;
+                fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
                 //return true;
             }
             else

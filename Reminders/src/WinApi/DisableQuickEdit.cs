@@ -24,7 +24,7 @@ namespace Reminders.src
             IntPtr consoleHandle = GetStdHandle(STD_INPUT_HANDLE);
 
             // get current console mode
-            if (!GetConsoleMode(consoleHandle, out uint consoleMode))
+            if (! GetConsoleMode(consoleHandle, out uint consoleMode))
             {
                 // ERROR: Unable to get console mode.
                 return false;
@@ -34,7 +34,7 @@ namespace Reminders.src
             consoleMode &= ~ENABLE_QUICK_EDIT; // bitwise not operator to disable quickedit
 
             // set the new mode
-            if (!SetConsoleMode(consoleHandle, consoleMode))
+            if (! SetConsoleMode(consoleHandle, consoleMode))
             {
                 // ERROR: Unable to set console mode
                 return false;
