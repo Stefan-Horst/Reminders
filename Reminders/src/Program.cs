@@ -99,12 +99,12 @@ namespace Reminders.src
             Console.WriteLine("MSG CLOSED"); //is only displayed after msgbox is closed NOTIFY USER OF MSGBOX IN CONSOLE THEN DEL MSG IN CMD AFTER CLOSE OF MSGBOX
             //string s = Console.ReadLine();
             //Console.Write("test");Console.CursorLeft--; Console.Write(" \b");Console.ReadLine();
+
             while (true) //main loop (test)
             {
                 int cursorYInit = Console.CursorTop;
-                int cursorXTotal = 0; // like cursorleft but does not reset at new lines SET TO XOFFSET TO MITIGATE PROBLEMS??? instead prob use total + offset in code below
-                int cursorXOffset = Console.CursorLeft; // normally 0, but not if there is a prompt before input
-                //bool lineFlag = false; // signals when cursor is at first pos of line
+                int cursorXTotal = 0; // like cursorleft but does not reset at new lines
+                int cursorXOffset; // length of prompt before input
 
                 string prompt = "> test: ";
                 Console.Write(prompt);
@@ -113,22 +113,19 @@ namespace Reminders.src
                 ConsoleKeyInfo cki = Console.ReadKey(true);
                 while (cki.Key != ConsoleKey.Enter)
                 {
-                    int X = Console.CursorLeft;
-                    int Y = Console.CursorTop;
-                    int l = cmdInput.Length; //3 vars only for debug del later
-
                     // ctrl key not pressed or alt key pressed (making ctrl+alt possible which equals altgr key)
-                    if ((cki.Modifiers & ConsoleModifiers.Control) == 0 || (cki.Modifiers & ConsoleModifiers.Alt) != 0/*&& cki.Key == ConsoleKey.I*//*&& (cki.Modifiers & ConsoleModifiers.Alt) == 0*/ /*|| new char[] {'@', '€', '|', '~', 'µ', '{', '}', '[', ']' }.Contains(cki.KeyChar)*/) //any more cases like german altgr+q for @?
+                    if ((cki.Modifiers & ConsoleModifiers.Control) == 0 || (cki.Modifiers & ConsoleModifiers.Alt) != 0) // prevents shortcuts like ctrl+i, but allows ones like altgr+q for @
                     {
                         Console.Write(cki.KeyChar);
 
-                        if (cki.Key == ConsoleKey.Backspace) // nested if so that backspace does not get added to cmdinput in else-part of statement
-                        {
-                            if (/*cmdInput.Length > 0*/Console.CursorLeft > cursorXOffset - 1 || Console.CursorTop > cursorYInit)
+                        if (cki.Key == ConsoleKey.Backspace)
+                        { 
+                            // nested if so that backspace does not get added to cmdinput in else-part of statement
+                            if (Console.CursorLeft > cursorXOffset - 1 || Console.CursorTop > cursorYInit)
                             {
                                 bool lineFlag = (cursorXOffset + cursorXTotal) % Console.BufferWidth == 0; // signals when cursor is at first pos of line
 
-                                // only go to row above when current row is empty (otherwise would already happen when first char in row is deleted, because cursor is at posx=0 after deletion)
+                                // only go to line above when current line is empty (otherwise would already happen when first char in line is deleted, because cursor then is at start of line)
                                 if (Console.CursorLeft == 0 && Console.CursorTop > cursorYInit && (cmdInput.Length + cursorXOffset) % Console.BufferWidth == 0)
                                 {
                                     Console.CursorTop--;
@@ -143,58 +140,48 @@ namespace Reminders.src
                                 cmdInput.Remove(cursorXTotal - 1, 1);
                                 cursorXTotal--;
 
-                                if (cursorXTotal < cmdInput.Length) // move text after backspace one to the left
+                                // move text after backspace one to the left if there is text after cursor
+                                if (cursorXTotal < cmdInput.Length) 
                                 {
                                     int tempPosY = Console.CursorTop;
-                                    /*Console.Write(cmdInput.ToString(cursorPos, cmdInput.Length - cursorPos)+" \b");*/
-                                    /*Console.CursorTop = tempPosY;*/
 
-                                    if (/*lineFlag == true &&*/ lineFlag == true && Console.CursorLeft == 0)
+                                    if (lineFlag == true) // if cursor x at start of line
                                     {
                                         Console.CursorTop = tempPosY - 1;
-                                        /*Console.CursorTop--;*/
                                         Console.CursorLeft = Console.BufferWidth - 1;
-                                        //Console.Write(cmdInput.ToString(cursorPos, cmdInput.Length - cursorPos) + " \b");
                                     }
-                                    //else
-                                    //{
                                     Console.Write(cmdInput.ToString(cursorXTotal, cmdInput.Length - cursorXTotal) + " \b");
-                                    //Console.CursorTop = tempPosY;
+
                                     Console.CursorTop = cursorYInit + (cursorXTotal + cursorXOffset) / Console.BufferWidth; // '/' discards remainder
                                     Console.CursorLeft = (cursorXTotal + cursorXOffset) % Console.BufferWidth;
-                                    //}
-
                                 }
-
-                                /*if (Console.CursorLeft == 0 *//*|| Console.CursorLeft == Console.BufferWidth - 1*//*)
-                                    lineFlag = true;
-                                else
-                                    lineFlag = false;*/
                             }
+                            // counteracts console standard behaviour of moving cursor one to the left
                             else if (Console.CursorLeft != 0)
                             {
                                 Console.CursorLeft++;
                             }
                         }
-                        else if (cki.Key == ConsoleKey.LeftArrow) //add if input goes over multiple rows
+                        else if (cki.Key == ConsoleKey.LeftArrow)
                         {
-                            if (Console.CursorLeft == 0 && Console.CursorTop > cursorYInit)
+                            if (Console.CursorLeft == 0 && Console.CursorTop > cursorYInit) // if cursor x at start of line but not start of input
                             {
                                 Console.CursorTop--;
                                 Console.CursorLeft = Console.BufferWidth - 1;
                                 cursorXTotal--;
                             }
-                            else if (Console.CursorLeft > cursorXOffset || Console.CursorTop > cursorYInit)
+                            else if (Console.CursorLeft > cursorXOffset || Console.CursorTop > cursorYInit) // if cursor x not at start of input
                             {
                                 Console.CursorLeft--;
                                 cursorXTotal--;
                             }
                         }
-                        else if (cki.Key == ConsoleKey.RightArrow) // nested if so that right arrow does not get added to cmdinput in else-part
+                        else if (cki.Key == ConsoleKey.RightArrow)
                         {
+                            // nested if so that right arrow does not get added to cmdinput in else-part
                             if (Console.CursorLeft - cursorXOffset < cmdInput.Length - (Console.CursorTop - cursorYInit) * Console.BufferWidth) // cursor can not exeed length of input
                             {
-                                if (Console.CursorLeft == Console.BufferWidth - 1)
+                                if (Console.CursorLeft == Console.BufferWidth - 1) // if cursor x at end of line
                                 {
                                     Console.CursorTop++;
                                     Console.CursorLeft = 0;
@@ -224,8 +211,8 @@ namespace Reminders.src
                         }
                         else if (cki.Key == ConsoleKey.End) //ende key
                         {
-                            Console.CursorTop = cursorYInit + (cmdInput.Length + cursorXOffset) / Console.BufferWidth;
-                            Console.CursorLeft = (cmdInput.Length + cursorXOffset) % Console.BufferWidth;
+                            Console.CursorTop = cursorYInit + (cursorXOffset + cmdInput.Length) / Console.BufferWidth;
+                            Console.CursorLeft = (cursorXOffset + cmdInput.Length) % Console.BufferWidth;
 
                             cursorXTotal = cmdInput.Length;
                         }
@@ -238,11 +225,12 @@ namespace Reminders.src
                         }
                         else if (cki.Key == ConsoleKey.Delete) //entf key
                         {
-                            if (Console.CursorLeft - cursorXOffset < cmdInput.Length - (Console.CursorTop - cursorYInit) * Console.BufferWidth)
+                            // nested if so that del key does not get added to cmdinput in else-part
+                            if (Console.CursorLeft - cursorXOffset < cmdInput.Length - (Console.CursorTop - cursorYInit) * Console.BufferWidth) // if not at end of input
                             {
                                 cmdInput.Remove(cursorXTotal, 1);
 
-                                if (Console.CursorLeft == Console.BufferWidth - 1)
+                                if (Console.CursorLeft == Console.BufferWidth - 1) // if cursor x at end of line
                                 {
                                     Console.Write(cmdInput.ToString(cursorXTotal, cmdInput.Length - cursorXTotal) + " \b");
                                 }
@@ -250,9 +238,8 @@ namespace Reminders.src
                                 {
                                     Console.Write(" \b" + cmdInput.ToString(cursorXTotal, cmdInput.Length - cursorXTotal) + " \b");
                                 }
-
-                                Console.CursorTop = cursorYInit + (cursorXTotal + cursorXOffset) / Console.BufferWidth;
-                                Console.CursorLeft = (cursorXTotal + cursorXOffset) % Console.BufferWidth;
+                                Console.CursorTop = cursorYInit + (cursorXOffset + cursorXTotal) / Console.BufferWidth;
+                                Console.CursorLeft = (cursorXOffset + cursorXTotal) % Console.BufferWidth;
                             }
                         }
                         else if (cki.Key == ConsoleKey.Escape)
@@ -262,7 +249,7 @@ namespace Reminders.src
                             Console.CursorLeft = cursorXOffset;
 
                             Console.Write("0"); // control char for esc to "eat"
-                            Console.Write("\b" + new string(' ', cmdInput.Length + 1));
+                            Console.Write("\b" + new string(' ', cmdInput.Length + 1)); // clear area of input
 
                             Console.CursorTop = cursorYInit;
                             Console.CursorLeft = cursorXOffset;
@@ -278,14 +265,13 @@ namespace Reminders.src
                         {
                             //just ignore for now / mode switching not really necessary
                         }
-                        else //if ((cki.Modifiers & ConsoleModifiers.Control) == 0 || (cki.Modifiers & ConsoleModifiers.Alt) != 0/*&& (cki.Modifiers & ConsoleModifiers.Alt) == 0 || new char[] { '@', '€', '|', '~', 'µ', '{', '}', '[', ']' }.Contains(cki.KeyChar)*/)
+                        else // handle normal key input
                         {
-                            /*Console.Write(cki.KeyChar.ToString());*/
-                            if (cursorXTotal >= cmdInput.Length)
+                            if (cursorXTotal >= cmdInput.Length) // if cursor is at end of input
                             {
                                 cmdInput.Append(cki.KeyChar);
 
-                                if (cursorXTotal % Console.BufferWidth + cursorXOffset == Console.BufferWidth - 1)
+                                if ((cursorXOffset + cursorXTotal) % Console.BufferWidth == Console.BufferWidth - 1) // if cursor x at end of line
                                 {
                                     Console.CursorTop++;
                                     Console.CursorLeft = 0;
@@ -296,50 +282,36 @@ namespace Reminders.src
                                 cmdInput.Insert(cursorXTotal, cki.KeyChar);
 
                                 int tempPosY = Console.CursorTop;
+
                                 Console.Write(cmdInput.ToString(cursorXTotal + 1, cmdInput.Length - cursorXTotal - 1)); // move text after insertion one to the right
 
-                                if (/*cursorXTotal + 1 == Console.BufferWidth*/(cursorXTotal + cursorXOffset) % Console.BufferWidth == Console.BufferWidth - 1)
+                                if ((cursorXOffset + cursorXTotal) % Console.BufferWidth == Console.BufferWidth - 1) // if cursor x at end of line
                                 {
                                     Console.CursorTop = tempPosY + 1;
                                     Console.CursorLeft = 0;
-                                    /*lineFlag = true;*/
                                 }
                                 else
                                 {
                                     Console.CursorTop = tempPosY;
-                                    Console.CursorLeft = (cursorXTotal + cursorXOffset) % Console.BufferWidth + 1;
+                                    Console.CursorLeft = (cursorXOffset + cursorXTotal) % Console.BufferWidth + 1;
                                 }
                             }
                             cursorXTotal++;
                         }
-
-                        /*if (Console.CursorLeft == 0)
-                            lineFlag = true;
-                        else
-                            lineFlag = false;*/
                     }
                     cki = Console.ReadKey(true);
 
                     cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; // changes value relative to changes to cursortop caused by cmd window resizing
                 }
-                //int tempPosX = Console.CursorLeft;
-
                 Console.WriteLine();
-           
-                //Console.CursorTop += (cursorXOffset + cmdInput.Length) / Console.BufferWidth - (cursorXOffset + cursorXTotal) / Console.BufferWidth;
-                /*if (tempPosX == 0 && cursorXTotal >= cmdInput.Length)
-                    Console.CursorTop--;*/
-                Console.CursorTop = cursorYInit + (cursorXOffset + cmdInput.Length) / Console.BufferWidth; // set cursor y to last line of input
-                if ((cursorXOffset + cmdInput.Length) % Console.BufferWidth > 0)
+                
+                Console.CursorTop = cursorYInit + (cursorXOffset + cmdInput.Length) / Console.BufferWidth; // set cursor y to next line after last (full) line of input
+                if ((cursorXOffset + cmdInput.Length) % Console.BufferWidth > 0) // move cursor y one more down if there is one last not full line of input
                     Console.CursorTop++;
 
                 PrintText(cmdInput.ToString());
-                Console.WriteLine(cmdInput.ToString()+"@ "+cmdInput.Length+" "+cmdInput.ToString().Length); //del later
+                Console.WriteLine(cmdInput.ToString()); //del later
                 cmdInput.Clear();
-
-                /*string s = Console.ReadLine();
-
-                PrintText(s);*/
             }
         }
 
