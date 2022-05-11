@@ -4,26 +4,33 @@ using System.Text;
 
 namespace Reminders.src
 {
-    class OutputTextWriter
+    class OutputTextWriter //call class "outputtext"?
     {
+        private IOutputWriter outputWriter;
+        
+        public OutputTextWriter (IOutputWriter outputWriter)
+        {
+            this.outputWriter = outputWriter;
+        }
+        
         public void ShowWelcome() //todo split into two first one ónly logo
         {
             // ASCII text from https://patorjk.com/software/taag/#p=display&h=3&v=0&f=Standard
-            Console.WriteLine("===================================================    \n" +
-                              "=   ____                _           _             =    \n" +
-                              "=  |  _ \\ ___ _ __ ___ (_)_ __   __| | ___ _ __   =   \n" +
-                              "=  | |_) / _ | '_ ` _ \\| | '_ \\ / _` |/ _ | '__|  =  \n" +
-                              "=  |  _ |  __| | | | | | | | | | (_| |  __| |     =    \n" +
-                              "=  |_| \\_\\___|_| |_| |_|_|_| |_|\\__,_|\\___|_|     =\n" +
-                              "=                                                 =    \n" +
-                              "===================================================    \n");
+            Console.WriteLine("=======================================================    \n" +
+                              "=   ____                _           _                 =    \n" +
+                              "=  |  _ \\ ___ _ __ ___ (_)_ __   __| | ___ _ __ ___   =   \n" +
+                              "=  | |_) / _ | '_ ` _ \\| | '_ \\ / _` |/ _ | '__/ __|  =  \n" +
+                              "=  |  _ |  __| | | | | | | | | | (_| |  __| |  \\__ \\  =  \n" +
+                              "=  |_| \\_\\___|_| |_| |_|_|_| |_|\\__,_|\\___|_|  |___/  =\n" +
+                              "=                                                     =    \n" +
+                              "=======================================================    \n");
 
-            
+            Console.WriteLine("Welcome to Reminders! Today's date is: " + DateTime.Today.ToShortDateString());
         }
 
-        public void ShowWelcomeReminders(int days, String reminders)
+        public void ShowWelcomeReminders(int days, string reminders)
         {
-            Console.WriteLine("Welcome to Reminder! Here is everything for the next {0}:", FormatTime(days));
+            Console.WriteLine("Here is everything for the next {0} days:", FormatTime(days)); //todo alt text for 0 or 1 day
             Console.WriteLine(GetUpcomingRemindersRaw(reminders));
         }
 
@@ -46,7 +53,7 @@ namespace Reminders.src
         }
 
         // only show upcoming reminders like in the welcome message
-        public void ShowUpcomingReminders(int days, String reminders)
+        public void ShowUpcomingReminders(int days, string reminders)
         {
             Console.WriteLine("Reminders for the next {0}:", FormatTime(days));
             Console.WriteLine(GetUpcomingRemindersRaw(reminders));
@@ -64,7 +71,7 @@ namespace Reminders.src
 
         }
 
-        public void ShowLog(int type)
+        public void ShowLog(int type) //use outputwriter here
         {
             switch (type)
             {
@@ -80,7 +87,7 @@ namespace Reminders.src
         }
 
         // shows error messages for the different possible errors caused directly by user input
-        public void ShowError(int type, string info)
+        public void ShowError(int type, string info) //use outputwriter here
         {
             Console.WriteLine("ERROR");
             switch (type)
@@ -102,9 +109,9 @@ namespace Reminders.src
         }
 
         // converts amount of days in weeks or months if possible
-        private String FormatTime(int days)
+        private string FormatTime(int days)
         {
-            String s;
+            string s;
             
             if (days % 7 == 0)
             {
@@ -132,7 +139,7 @@ namespace Reminders.src
             return s;
         }
 
-        private String GetUpcomingRemindersRaw(String reminders) //reminder as string or array, should already be correct amount for time, this method is only for formatting
+        private string GetUpcomingRemindersRaw(string reminders) //reminder as string or array, should already be correct amount for time, this method is only for formatting
         {
 
             return "";

@@ -11,7 +11,8 @@ namespace Reminders.src
         private const int TimeOneSecond = 1000;
         private const int IdleTimeoutValue = 10; // value * 1s = time from last user input till console may delete unentered user input to display new output
         //maybe let user change timeout value in config?
-        private static OutputTextWriter writer = new OutputTextWriter(); //call this from remindermanager or commandexecuter (if even needed at all)
+        private static IOutputWriter outputWriter;
+        private static OutputTextWriter writer; //call this from remindermanager or commandexecuter (if even needed at all)
         private static ReminderManager reminderMgr;
         private static CommandExecutor cmdExec;
         private static Queue<string> outputTextQueue = new Queue<string>();
@@ -20,7 +21,7 @@ namespace Reminders.src
 
         public static void Main()
         {
-            Test();
+            //Test();
 
             Init();
 
@@ -38,6 +39,9 @@ namespace Reminders.src
         public static void Init()
         {
             Console.OutputEncoding = Encoding.Unicode;
+
+            outputWriter = new OutputWriter(reminderMgr); //problem of circular dependency?
+            writer = new OutputTextWriter(outputWriter);
 
             DisableQuickEdit dqe = new DisableQuickEdit();
             if (!dqe.Disable())

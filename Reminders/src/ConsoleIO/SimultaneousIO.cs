@@ -8,6 +8,7 @@ namespace Reminders.src
     {
         private string promptDefault = "";
         private Queue<string> outputTextQueue = new Queue<string>();
+        private IOutputWriter outputWriter;
 
         public SimultaneousConsoleIO()
         {
