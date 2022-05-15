@@ -16,14 +16,14 @@ namespace Reminders.src
         public void ShowWelcome() //todo split into two first one ónly logo
         {
             // ASCII text from https://patorjk.com/software/taag/#p=display&h=3&v=0&f=Standard
-            Console.WriteLine("=======================================================    \n" +
-                              "=   ____                _           _                 =    \n" +
-                              "=  |  _ \\ ___ _ __ ___ (_)_ __   __| | ___ _ __ ___   =   \n" +
-                              "=  | |_) / _ | '_ ` _ \\| | '_ \\ / _` |/ _ | '__/ __|  =  \n" +
-                              "=  |  _ |  __| | | | | | | | | | (_| |  __| |  \\__ \\  =  \n" +
-                              "=  |_| \\_\\___|_| |_| |_|_|_| |_|\\__,_|\\___|_|  |___/  =\n" +
-                              "=                                                     =    \n" +
-                              "=======================================================    \n");
+            Console.WriteLine("=======================================================    " + Environment.NewLine +
+                              "=   ____                _           _                 =    " + Environment.NewLine +
+                              "=  |  _ \\ ___ _ __ ___ (_)_ __   __| | ___ _ __ ___   =   " + Environment.NewLine +
+                              "=  | |_) / _ | '_ ` _ \\| | '_ \\ / _` |/ _ | '__/ __|  =  " + Environment.NewLine +
+                              "=  |  _ |  __| | | | | | | | | | (_| |  __| |  \\__ \\  =  " + Environment.NewLine +
+                              "=  |_| \\_\\___|_| |_| |_|_|_| |_|\\__,_|\\___|_|  |___/  =" + Environment.NewLine +
+                              "=                                                     =    " + Environment.NewLine +
+                              "=======================================================    " + Environment.NewLine);
 
             Console.WriteLine("Welcome to Reminders! Today's date is: " + DateTime.Today.ToShortDateString());
         }

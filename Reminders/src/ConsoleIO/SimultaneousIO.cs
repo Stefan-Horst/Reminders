@@ -7,13 +7,13 @@ namespace Reminders.src
     class SimultaneousConsoleIO
     {
         private string promptDefault = "";
-        //private Queue<string> outputTextQueue = new Queue<string>();
         private IOutputWriter outputWriter;
         private ITextProvider textProvider;
 
-        public SimultaneousConsoleIO(IOutputWriter outputWriter)
+        public SimultaneousConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider)
         {
             this.outputWriter = outputWriter;
+            this.textProvider = textProvider;
         }
 
         public SimultaneousConsoleIO(string promptDefault)
@@ -55,7 +55,7 @@ namespace Reminders.src
                             Console.CursorLeft++; // counteracts console standard behaviour of moving cursor one to the left
 
                             // nested if so that backspace does not get added to cmdinput in else-part of statement
-                            if (Console.CursorLeft > cursorXOffset /*+ 1*/ || Console.CursorTop > cursorYInit)
+                            if (Console.CursorLeft > cursorXOffset || Console.CursorTop > cursorYInit)
                             {
                                 bool lineFlag = (cursorXOffset + cursorXTotal) % Console.BufferWidth == 0; // signals when cursor is at first pos of line
 
@@ -77,7 +77,7 @@ namespace Reminders.src
                                     Console.CursorLeft--;
                                 }
 
-                                if (cursorXOffset == 0 || cursorXTotal > 0)
+                                if (cursorXTotal > 0) 
                                 {
                                     cmdInput.Remove(cursorXTotal - 1, 1);
                                     cursorXTotal--;
@@ -99,12 +99,6 @@ namespace Reminders.src
                                     }
                                 }
                             }
-                            // counteracts console standard behaviour of moving cursor one to the left
-                          /*  else if (Console.CursorLeft != 0 || cursorXOffset > 0)
-                            {
-                                Console.CursorLeft++;
-                            }*/
-                            else { }
                         }
                         else if (cki.Key == ConsoleKey.LeftArrow)
                         {
@@ -245,18 +239,9 @@ namespace Reminders.src
                     }
                     cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; // changes value relative to changes to cursortop caused by cmd window resizing
                 }
-                /*if (Console.KeyAvailable)
-                {
-                    cki = Console.ReadKey(true);*/
-
-                /*}
-                else
-                {
-                    cki = default;
-                }*/
-                //PrintText(cmdInput.ToString(), cursorYInit, prompt);
             } 
             while (cki.Key != ConsoleKey.Enter);
+
             cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; // changes value relative to changes to cursortop caused by cmd window resizing
 
             Console.WriteLine();
