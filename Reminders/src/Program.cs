@@ -40,7 +40,7 @@ namespace Reminders.src
         {
             Console.OutputEncoding = Encoding.Unicode;
 
-            outputWriter = new OutputWriter(reminderMgr); //problem of circular dependency?
+            outputWriter = new OutputWriter(); //problem of circular dependency?
             writer = new OutputTextWriter(outputWriter);
 
             DisableQuickEdit dqe = new DisableQuickEdit();
@@ -52,6 +52,27 @@ namespace Reminders.src
 
             writer.ShowWelcome(); //todo 2 methods first only void, add args of method to config (or data?)
             writer.ShowWelcomeReminders(reminderMgr.UpcomingDays, "");
+
+            /* while (true)
+             {
+                 if (DateTime.Now == new DateTime(DateTime.Now.Year, 5, 25))
+                     Console.WriteLine("g");
+                 //Thread.Sleep(25);
+             }*/
+            SimultaneousConsoleIO simio = new SimultaneousConsoleIO(outputWriter, new TextProvider(outputWriter));
+
+            Task.Run(() => {
+                int i = 0;
+                while (true)
+                {
+                    outputWriter.AddText("test"+i);
+                    i++;
+                    Thread.Sleep(5000);
+                }
+            });
+
+            while (true)
+                simio.ReadLine(""); //use keyavailable there so readline doesnt block and output doesnt need extra thread
         }
 
 
@@ -110,7 +131,7 @@ namespace Reminders.src
                 int cursorXTotal = 0; // like cursorleft but does not reset at new lines
                 int cursorXOffset; // length of prompt before input
 
-                string prompt = "> test: ";
+                string prompt = "";
                 Console.Write(prompt);
                 cursorXOffset = prompt.Length;
 

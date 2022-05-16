@@ -5,8 +5,8 @@ namespace Reminders.src
     {
         public void AddText(string text);
 
-        //public string GetText();
+        public string GetText();
 
-        public void UpdateTempData(string inputCache, int cursorYInit);
+        //public void UpdateTempData(string inputCache, int cursorYInit);
     }
 }

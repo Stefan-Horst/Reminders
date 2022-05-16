@@ -1,41 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Reminders.src
 {
     class SimultaneousConsoleIO
     {
-        private string promptDefault = "";
+        private string promptDefault;
+        // pause time in main loop (waiting for key input or text output)
+        private int sleepTime = 25; // pause as short as possible without eating cpu
         private IOutputWriter outputWriter;
         private ITextProvider textProvider;
 
-        public SimultaneousConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider)
+        public SimultaneousConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider, string promptDefault)
         {
             this.outputWriter = outputWriter;
             this.textProvider = textProvider;
-        }
-
-        public SimultaneousConsoleIO(string promptDefault)
-        {
             this.promptDefault = promptDefault;
         }
 
-        public string SimulReadLine()
+        public SimultaneousConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider) 
+            : this(outputWriter, textProvider, "")
+        { }
+
+        public string ReadLine()
         {
-            return SimulReadLine(promptDefault);
+            return ReadLine(promptDefault);
         }
 
-        public string SimulReadLine(string prompt)
+        public string ReadLine(string prompt)
         {
             StringBuilder cmdInput = new StringBuilder();
 
             int cursorYInit = Console.CursorTop;
             int cursorXTotal = 0; // like cursorleft but does not reset at new lines
-            int cursorXOffset; // length of prompt before input
-
+            int cursorXOffset = prompt.Length; // length of prompt before input
+            
             Console.Write(prompt);
-            cursorXOffset = prompt.Length;
 
             ConsoleKeyInfo cki = default;
 
@@ -237,9 +239,37 @@ namespace Reminders.src
                             cursorXTotal++;
                         }
                     }
-                    cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; // changes value relative to changes to cursortop caused by cmd window resizing
+                    //cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; 
                 }
-            } 
+                cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; // changes value relative to changes to cursortop caused by cmd window resizing
+
+                bool textPrinted = PrintText(cmdInput.ToString(), cursorYInit, prompt); // write text to console "while" getting user input
+                
+                if (textPrinted)
+                    cursorYInit = Console.CursorTop;
+
+                /*string output = outputWriter.GetText();
+
+                if (output.Length > 0)
+                {
+                    int tempPosY = Console.CursorTop;
+                    Console.CursorTop = cursorYInit + 1;
+                    Console.CursorLeft = 0;
+                    for (int i = cursorYInit; i < tempPosY; i++) // clear current user input
+                    {
+                        Console.WriteLine(new string(' ', Console.BufferWidth));
+                    }
+                    Console.CursorTop = tempPosY;
+
+                    Console.WriteLine(output);
+
+                    Console.Write(prompt + cmdInput.ToString());
+
+                    cursorYInit = Console.CursorTop;
+                }*/
+
+                Thread.Sleep(sleepTime);
+            }
             while (cki.Key != ConsoleKey.Enter);
 
             cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; // changes value relative to changes to cursortop caused by cmd window resizing
@@ -252,7 +282,7 @@ namespace Reminders.src
 
             string input = cmdInput.ToString();
             //PrintText(input, cursorYInit, prompt);
-            outputWriter.UpdateTempData(prompt + input, cursorYInit);
+            //outputWriter.UpdateTempData(prompt + input, cursorYInit);
             Console.WriteLine(input); //del later
 
             //outputWriter.WriteText();
@@ -260,29 +290,38 @@ namespace Reminders.src
             return input;
         }
 
-        /*private void PrintText(string inputCache, int cursorYInit, string prompt) //use cmdinput,... instead
+        // writes all output cached in the outputwriter to the console, returns true if any text was printed, otherwise returns false
+        private bool PrintText(string inputCache, int cursorYInit, string prompt)
         {
             string output = outputWriter.GetText();
             
             if (output.Length > 0)
             {
                 int tempPosY = Console.CursorTop;
-                Console.CursorTop = cursorYInit;
-                for (int i = cursorYInit; i < tempPosY; i++)
+                Console.CursorTop = cursorYInit /*+ 1*/;
+                Console.CursorLeft = 0;
+                for (int i = cursorYInit; i <= tempPosY; i++) // clear current user input
                 {
                     Console.WriteLine(new string(' ', Console.BufferWidth));
                 }
-                Console.CursorTop = tempPosY;
+                Console.CursorTop = cursorYInit;
 
-                //foreach (string output in outputTextQueue)
-                //{
-                    Console.WriteLine(output);
-                //}
+                Console.WriteLine(output);
+
                 Console.Write(prompt + inputCache);
-            }
-        }*/
 
-        public void SimulWriteLine(string text)
+                // make cursor break line when input reaches end of line
+                if (prompt.Length + inputCache.Length > 0 && (prompt.Length + inputCache.Length) % Console.BufferWidth == 0)
+                {
+                    Console.CursorTop++;
+                    Console.CursorLeft = 0;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public void WriteLine(string text)
         {
             outputWriter.AddText(text);
         }
