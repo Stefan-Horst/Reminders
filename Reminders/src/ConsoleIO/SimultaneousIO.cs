@@ -239,34 +239,10 @@ namespace Reminders.src
                             cursorXTotal++;
                         }
                     }
-                    //cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; 
                 }
+                PrintText(cmdInput.ToString(), cursorYInit, prompt, cursorXOffset, cursorXTotal); // write text to console "while" getting user input
+
                 cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; // changes value relative to changes to cursortop caused by cmd window resizing
-
-                bool textPrinted = PrintText(cmdInput.ToString(), cursorYInit, prompt); // write text to console "while" getting user input
-                
-                if (textPrinted)
-                    cursorYInit = Console.CursorTop;
-
-                /*string output = outputWriter.GetText();
-
-                if (output.Length > 0)
-                {
-                    int tempPosY = Console.CursorTop;
-                    Console.CursorTop = cursorYInit + 1;
-                    Console.CursorLeft = 0;
-                    for (int i = cursorYInit; i < tempPosY; i++) // clear current user input
-                    {
-                        Console.WriteLine(new string(' ', Console.BufferWidth));
-                    }
-                    Console.CursorTop = tempPosY;
-
-                    Console.WriteLine(output);
-
-                    Console.Write(prompt + cmdInput.ToString());
-
-                    cursorYInit = Console.CursorTop;
-                }*/
 
                 Thread.Sleep(sleepTime);
             }
@@ -281,24 +257,25 @@ namespace Reminders.src
                 Console.CursorTop++;
 
             string input = cmdInput.ToString();
-            //PrintText(input, cursorYInit, prompt);
-            //outputWriter.UpdateTempData(prompt + input, cursorYInit);
-            Console.WriteLine(input); //del later
 
-            //outputWriter.WriteText();
+            Console.WriteLine(input); //del later
 
             return input;
         }
 
         // writes all output cached in the outputwriter to the console, returns true if any text was printed, otherwise returns false
-        private bool PrintText(string inputCache, int cursorYInit, string prompt)
+        private void PrintText(string inputCache, int cursorYInit, string prompt, int cursorXOffset, int cursorXTotal)
         {
             string output = outputWriter.GetText();
             
             if (output.Length > 0)
             {
-                int tempPosY = Console.CursorTop;
-                Console.CursorTop = cursorYInit /*+ 1*/;
+                // set to cursor y pos last line of input
+                int tempPosY = cursorYInit + (cursorXOffset + inputCache.Length) / Console.BufferWidth;
+                if ((cursorXOffset + inputCache.Length) % Console.BufferWidth > 0)
+                    tempPosY++;
+
+                Console.CursorTop = cursorYInit;
                 Console.CursorLeft = 0;
                 for (int i = cursorYInit; i <= tempPosY; i++) // clear current user input
                 {
@@ -307,18 +284,24 @@ namespace Reminders.src
                 Console.CursorTop = cursorYInit;
 
                 Console.WriteLine(output);
+                
+                tempPosY = Console.CursorTop;
+                int tempPosX = Console.CursorLeft;
 
                 Console.Write(prompt + inputCache);
 
                 // make cursor break line when input reaches end of line
-                if (prompt.Length + inputCache.Length > 0 && (prompt.Length + inputCache.Length) % Console.BufferWidth == 0)
+                /*if (prompt.Length + inputCache.Length > 0 && (prompt.Length + inputCache.Length) % Console.BufferWidth == 0)
                 {
                     Console.CursorTop++;
                     Console.CursorLeft = 0;
+                }*/
+                //else //does prompt cause problems with window resizing? if yes change to cursorxtotal + prompt.length above
+                {
+                    Console.CursorTop = tempPosY + (cursorXTotal + cursorXOffset) / Console.BufferWidth; // '/' discards remainder
+                    Console.CursorLeft = tempPosX + (cursorXTotal + cursorXOffset) % Console.BufferWidth;
                 }
-                return true;
             }
-            return false;
         }
 
         public void WriteLine(string text)
