@@ -13,7 +13,7 @@ namespace Reminders.src
             this.outputWriter = outputWriter;
         }
         
-        public void ShowWelcome() //todo split into two first one ónly logo
+        public void ShowWelcome() //todo split into two first one only logo
         {
             // ASCII text from https://patorjk.com/software/taag/#p=display&h=3&v=0&f=Standard
             Console.WriteLine("=======================================================    " + Environment.NewLine +
