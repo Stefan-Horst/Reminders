@@ -55,7 +55,7 @@ namespace Reminders.src
                      Console.WriteLine("g");
                  //Thread.Sleep(25);
              }*/
-            SimultaneousConsoleIO simio = new SimultaneousConsoleIO(outputWriter, new TextProvider(outputWriter));
+            SimultaneousConsoleIO simio = new SimultaneousConsoleIO(outputWriter, new TextProvider());
 
             Task.Run(() => {
                 int i = 0;

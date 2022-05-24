@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Reminders.src
 {
@@ -9,19 +7,14 @@ namespace Reminders.src
         private IOutputWriter outputWriter;
         private ReminderManager reminderManager;
 
-        public TextProvider(IOutputWriter outputWriter)
+        public void SetOutputWriter(IOutputWriter outputWriter)
         {
             this.outputWriter = outputWriter;
         }
 
-        public void Run()
+        public void CheckForText()
         {
-            while (true)
-            {
-                reminderManager.GetDueReminders(DateTime.Now).ForEach(i => outputWriter.AddText(i.ToString()));
-
-                //System.Threading.Thread.Sleep(sleepTime);
-            }
+            reminderManager.GetDueReminders(DateTime.Now).ForEach(i => outputWriter.AddText(i.ToString()));
         }
     }
 }

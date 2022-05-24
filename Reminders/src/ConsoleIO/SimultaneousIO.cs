@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
@@ -18,6 +17,8 @@ namespace Reminders.src
             this.outputWriter = outputWriter;
             this.textProvider = textProvider;
             this.promptDefault = promptDefault;
+
+            textProvider.SetOutputWriter(outputWriter);
         }
 
         public SimultaneousConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider) 
@@ -240,6 +241,7 @@ namespace Reminders.src
                         }
                     }
                 }
+                textProvider.CheckForText();
                 PrintText(cmdInput.ToString(), cursorYInit, prompt, cursorXOffset, cursorXTotal); // write text to console "while" getting user input
 
                 cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; // changes value relative to changes to cursortop caused by cmd window resizing
