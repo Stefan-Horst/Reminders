@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
-namespace Reminders.src
+namespace Reminders.WinApi
 {
     class ShortcutCreator
     {

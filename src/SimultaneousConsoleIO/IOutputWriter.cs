@@ -1,7 +1,7 @@
 ﻿
-namespace Reminders.src
+namespace SimultaneousConsoleIO
 {
-    interface IOutputWriter
+    public interface IOutputWriter
     {
         public void AddText(string text);
 

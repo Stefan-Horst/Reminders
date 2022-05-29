@@ -1,6 +1,7 @@
 ﻿using System;
+using SimultaneousConsoleIO;
 
-namespace Reminders.src
+namespace Reminders.ConsoleIO
 {
     class TextProvider : ITextProvider
     {

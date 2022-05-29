@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Reminders.ConsoleIO;
+using Reminders.WinApi;
+using SimultaneousConsoleIO;
 
-namespace Reminders.src
+namespace Reminders
 {
     class Program
     {
@@ -55,7 +58,7 @@ namespace Reminders.src
                      Console.WriteLine("g");
                  //Thread.Sleep(25);
              }*/
-            SimultaneousConsoleIO simio = new SimultaneousConsoleIO(outputWriter, new TextProvider(outputWriter, reminderMgr));
+            SimulConsoleIO simio = new SimulConsoleIO(outputWriter, new TextProvider(outputWriter, reminderMgr));
 
             Task.Run(() => {
                 int i = 0;

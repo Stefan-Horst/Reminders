@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using Reminders.WinApi;
 
-namespace Reminders.src
+namespace Reminders
 {
     class FileManager
     {

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <StartupObject>Reminders.src.Program</StartupObject>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -23,5 +23,9 @@
 
 	<ItemGroup>
 	  <Folder Include="src\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SimultaneousConsoleIO\SimultaneousConsoleIO.csproj" />
 	</ItemGroup>
 </Project>

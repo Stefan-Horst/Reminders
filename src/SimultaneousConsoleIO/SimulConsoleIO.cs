@@ -2,9 +2,9 @@
 using System.Text;
 using System.Threading;
 
-namespace Reminders.src
+namespace SimultaneousConsoleIO
 {
-    class SimultaneousConsoleIO
+    public class SimulConsoleIO
     {
         private string promptDefault;
         // pause time in main loop (waiting for key input or text output)
@@ -12,7 +12,7 @@ namespace Reminders.src
         private IOutputWriter outputWriter;
         private ITextProvider textProvider;
 
-        public SimultaneousConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider, string promptDefault)
+        public SimulConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider, string promptDefault)
         {
             this.outputWriter = outputWriter;
             this.textProvider = textProvider;
@@ -21,7 +21,7 @@ namespace Reminders.src
             textProvider.SetOutputWriter(outputWriter);
         }
 
-        public SimultaneousConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider) 
+        public SimulConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider) 
             : this(outputWriter, textProvider, "")
         { }
 

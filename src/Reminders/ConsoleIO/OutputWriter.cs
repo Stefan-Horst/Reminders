@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using SimultaneousConsoleIO;
 
-namespace Reminders.src
+namespace Reminders.ConsoleIO
 {
     class OutputWriter : IOutputWriter //maybe let everybody call this class and only this then calls outputtextwriter? or just combine both output classes (modularity?)?
     {

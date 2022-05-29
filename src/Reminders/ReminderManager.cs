@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Reminders.src
+namespace Reminders
 {
     class ReminderManager
     {

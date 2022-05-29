@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Reminders.src
+namespace Reminders.WinApi
 {
     class DisableQuickEdit
     {

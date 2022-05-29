@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using SimultaneousConsoleIO;
 
-namespace Reminders.src
+namespace Reminders
 {
     class OutputTextWriter //call class "outputtext"?
     {
