@@ -79,7 +79,7 @@ namespace Reminders.src
         public TimeSpan GetRemainingTime(int id, DateTime dateToCompare)
         {
             DateTime dt = ReadReminder(id).Date;
-            Console.WriteLine(dt.ToString()+"-"+dateToCompare.ToString()+"="+dt.Subtract(dateToCompare));
+            //Console.WriteLine(dt.ToString()+"-"+dateToCompare.ToString()+"="+dt.Subtract(dateToCompare)); always absolute number
             return dt.Subtract(dateToCompare);
         }
 

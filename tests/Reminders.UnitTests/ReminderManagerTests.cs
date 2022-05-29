@@ -28,7 +28,7 @@ namespace Reminders.UnitTests
             //D:\Stefan\Programmieren\VisualStudioProjects\Reminders\Reminders.UnitTests\bin\Debug\netcoreapp3.1\data.rmdr
             File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data.rmdr"), "", Encoding.Unicode);
 
-            rm = new ReminderManager(new OutputTextWriter()); //OutputTextWriter will not be used, but is mandatory arg
+            rm = new ReminderManager(new OutputTextWriter(new OutputWriter())); //OutputTextWriter will not be used, but is mandatory arg
         }
 
         //[TestMethod]
