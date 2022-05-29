@@ -22,10 +22,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="src\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <ProjectReference Include="..\SimultaneousConsoleIO\SimultaneousConsoleIO.csproj" />
 	</ItemGroup>
 </Project>
