@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
@@ -6,11 +7,17 @@ namespace SimultaneousConsoleIO
 {
     public class SimulConsoleIO
     {
+        private IOutputWriter outputWriter;
+        private ITextProvider textProvider;
         private string promptDefault;
         // pause time in main loop (waiting for key input or text output)
         private int sleepTime = 25; // pause as short as possible without eating cpu
-        private IOutputWriter outputWriter;
-        private ITextProvider textProvider;
+        private List<string> history = new List<string>();
+
+        public IOutputWriter OutputWriter { get => outputWriter; set => outputWriter = value; }
+        public ITextProvider TextProvider { get => textProvider; set => textProvider = value; }
+        public string PromptDefault { get => promptDefault; set => promptDefault = value; }
+        public int SleepTime { get => sleepTime; set => sleepTime = value; }
 
         public SimulConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider, string promptDefault)
         {
@@ -21,9 +28,27 @@ namespace SimultaneousConsoleIO
             textProvider.SetOutputWriter(outputWriter);
         }
 
-        public SimulConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider) 
+        public SimulConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider)
             : this(outputWriter, textProvider, "")
         { }
+
+        public SimulConsoleIO(IOutputWriter outputWriter, string promptDefault)
+            : this(outputWriter, null, promptDefault)
+        { }
+
+        public SimulConsoleIO(IOutputWriter outputWriter)
+            : this(outputWriter, null, "")
+        { }
+
+        public void Write(string text)
+        {
+            outputWriter.AddText(text);
+        }
+
+        public void WriteLine(string text)
+        {
+            Write(text + Environment.NewLine);
+        }
 
         public string ReadLine()
         {
@@ -37,7 +62,8 @@ namespace SimultaneousConsoleIO
             int cursorYInit = Console.CursorTop;
             int cursorXTotal = 0; // like cursorleft but does not reset at new lines
             int cursorXOffset = prompt.Length; // length of prompt before input
-            
+            int index = -1; // index of history list
+
             Console.Write(prompt);
 
             ConsoleKeyInfo cki = default;
@@ -45,11 +71,11 @@ namespace SimultaneousConsoleIO
             do // while (cki.Key != ConsoleKey.Enter)
             {
                 if (Console.KeyAvailable)
-                { 
+                {
                     cki = Console.ReadKey(true);
 
                     // ctrl key not pressed or alt key pressed (making ctrl+alt possible which equals altgr key), prevents shortcuts like ctrl+i, but allows ones like altgr+q for @
-                    if (cki.Key != ConsoleKey.Enter && ((cki.Modifiers & ConsoleModifiers.Control) == 0 || (cki.Modifiers & ConsoleModifiers.Alt) != 0)) 
+                    if (cki.Key != ConsoleKey.Enter && ((cki.Modifiers & ConsoleModifiers.Control) == 0 || (cki.Modifiers & ConsoleModifiers.Alt) != 0))
                     {
                         Console.Write(cki.KeyChar);
 
@@ -76,11 +102,11 @@ namespace SimultaneousConsoleIO
                                     Console.Write(" \b");
                                 }
                                 else // makes it possible to backspace to start of line (cursor x = 0)
-                                { 
+                                {
                                     Console.CursorLeft--;
                                 }
 
-                                if (cursorXTotal > 0) 
+                                if (cursorXTotal > 0)
                                 {
                                     cmdInput.Remove(cursorXTotal - 1, 1);
                                     cursorXTotal--;
@@ -97,8 +123,7 @@ namespace SimultaneousConsoleIO
                                         }
                                         Console.Write(cmdInput.ToString(cursorXTotal, cmdInput.Length - cursorXTotal) + " \b");
 
-                                        Console.CursorTop = cursorYInit + (cursorXTotal + cursorXOffset) / Console.BufferWidth; // '/' discards remainder
-                                        Console.CursorLeft = (cursorXTotal + cursorXOffset) % Console.BufferWidth;
+                                        SetCursorEndOfInput(cursorYInit, cursorXOffset, cursorXTotal);
                                     }
                                 }
                             }
@@ -136,26 +161,87 @@ namespace SimultaneousConsoleIO
                         }
                         else if (cki.Key == ConsoleKey.UpArrow) //up and down for history
                         {
+                            if (history.Count > 0)
+                            {
+                                ClearInput(cursorYInit, cursorXOffset, cmdInput.Length);
 
+                                if (index == -1) // jumps to first element of history at first use of up/down key
+                                    index = 0;
+                                else if (index > 0)
+                                    index--;
+
+                                Console.Write(history[index]);
+
+                                cmdInput.Clear();
+                                cmdInput.Append(history[index]);
+
+                                cursorXTotal = cmdInput.Length;
+
+                                SetCursorEndOfInput(cursorYInit, cursorXOffset, cursorXTotal);
+                            }
                         }
                         else if (cki.Key == ConsoleKey.DownArrow)
                         {
+                            if (history.Count > 0)
+                            {
+                                ClearInput(cursorYInit, cursorXOffset, cmdInput.Length);
 
+                                if (index == -1) // jumps to last element of history at first use of up/down key
+                                    index = history.Count - 1;
+                                else if (index < history.Count - 1)
+                                    index++;
+
+                                Console.Write(history[index]);
+
+                                cmdInput.Clear();
+                                cmdInput.Append(history[index]);
+
+                                cursorXTotal = cmdInput.Length;
+
+                                SetCursorEndOfInput(cursorYInit, cursorXOffset, cursorXTotal);
+                            }
                         }
                         else if (cki.Key == ConsoleKey.PageUp) //page up/down for first/last history entry
                         {
+                            if (history.Count > 0)
+                            {
+                                ClearInput(cursorYInit, cursorXOffset, cmdInput.Length);
 
+                                index = 0;
+
+                                Console.Write(history[0]); // first element of history
+
+                                cmdInput.Clear();
+                                cmdInput.Append(history[0]);
+
+                                cursorXTotal = cmdInput.Length;
+
+                                SetCursorEndOfInput(cursorYInit, cursorXOffset, cursorXTotal);
+                            }
                         }
                         else if (cki.Key == ConsoleKey.PageDown)
                         {
+                            if (history.Count > 0)
+                            {
+                                ClearInput(cursorYInit, cursorXOffset, cmdInput.Length);
 
+                                index = history.Count - 1;
+
+                                Console.Write(history[^1]); // last element of history
+
+                                cmdInput.Clear();
+                                cmdInput.Append(history[^1]);
+
+                                cursorXTotal = cmdInput.Length;
+
+                                SetCursorEndOfInput(cursorYInit, cursorXOffset, cursorXTotal);
+                            }
                         }
                         else if (cki.Key == ConsoleKey.End) //ende key
                         {
-                            Console.CursorTop = cursorYInit + (cursorXOffset + cmdInput.Length) / Console.BufferWidth;
-                            Console.CursorLeft = (cursorXOffset + cmdInput.Length) % Console.BufferWidth;
-
                             cursorXTotal = cmdInput.Length;
+
+                            SetCursorEndOfInput(cursorYInit, cursorXOffset, cursorXTotal);
                         }
                         else if (cki.Key == ConsoleKey.Home) //pos1 key
                         {
@@ -179,13 +265,11 @@ namespace SimultaneousConsoleIO
                                 {
                                     Console.Write(" \b" + cmdInput.ToString(cursorXTotal, cmdInput.Length - cursorXTotal) + " \b");
                                 }
-                                Console.CursorTop = cursorYInit + (cursorXOffset + cursorXTotal) / Console.BufferWidth;
-                                Console.CursorLeft = (cursorXOffset + cursorXTotal) % Console.BufferWidth;
+                                SetCursorEndOfInput(cursorYInit, cursorXOffset, cursorXTotal);
                             }
                         }
                         else if (cki.Key == ConsoleKey.Escape)
                         {
-                            //add cmd to history before?
                             Console.CursorTop = cursorYInit;
                             Console.CursorLeft = cursorXOffset;
 
@@ -194,6 +278,8 @@ namespace SimultaneousConsoleIO
 
                             Console.CursorTop = cursorYInit;
                             Console.CursorLeft = cursorXOffset;
+
+                            history.Add(cmdInput.ToString()); // feature might not be desired
 
                             cmdInput.Clear();
                             cursorXTotal = 0;
@@ -241,7 +327,8 @@ namespace SimultaneousConsoleIO
                         }
                     }
                 }
-                textProvider.CheckForText();
+                if (textProvider != null)
+                    textProvider.CheckForText();
                 PrintText(cmdInput.ToString(), cursorYInit, prompt, cursorXOffset, cursorXTotal); // write text to console "while" getting user input
 
                 cursorYInit = Console.CursorTop - (cursorXOffset + cursorXTotal) / Console.BufferWidth; // changes value relative to changes to cursortop caused by cmd window resizing
@@ -258,18 +345,35 @@ namespace SimultaneousConsoleIO
             if ((cursorXOffset + cmdInput.Length) % Console.BufferWidth > 0) // move cursor y one more down if there is one last not full line of input
                 Console.CursorTop++;
 
-            string input = cmdInput.ToString();
+            history.Add(cmdInput.ToString());
 
-            Console.WriteLine(input); //del later
+            return cmdInput.ToString();
+        }
 
-            return input;
+        // sets cursor position to end of user input (behind last character)
+        private void SetCursorEndOfInput(int cursorYInit, int cursorXOffset, int cursorXTotal)
+        {
+            Console.CursorTop = cursorYInit + (cursorXTotal + cursorXOffset) / Console.BufferWidth; // '/' discards remainder
+            Console.CursorLeft = (cursorXTotal + cursorXOffset) % Console.BufferWidth;
+        }
+
+        // deletes all user input and returns cursor to starting position
+        private void ClearInput(int cursorYInit, int cursorXOffset, int inputLength)
+        {
+            Console.CursorTop = cursorYInit;
+            Console.CursorLeft = cursorXOffset;
+
+            Console.Write(new string(' ', inputLength + 1)); // clear area of input
+
+            Console.CursorTop = cursorYInit;
+            Console.CursorLeft = cursorXOffset;
         }
 
         // writes all output cached in the outputwriter to the console, returns true if any text was printed, otherwise returns false
         private void PrintText(string inputCache, int cursorYInit, string prompt, int cursorXOffset, int cursorXTotal)
         {
             string output = outputWriter.GetText();
-            
+
             if (output.Length > 0)
             {
                 // set to cursor y pos last line of input
@@ -286,29 +390,15 @@ namespace SimultaneousConsoleIO
                 Console.CursorTop = cursorYInit;
 
                 Console.WriteLine(output);
-                
+
                 tempPosY = Console.CursorTop;
                 int tempPosX = Console.CursorLeft;
 
                 Console.Write(prompt + inputCache);
 
-                // make cursor break line when input reaches end of line
-                /*if (prompt.Length + inputCache.Length > 0 && (prompt.Length + inputCache.Length) % Console.BufferWidth == 0)
-                {
-                    Console.CursorTop++;
-                    Console.CursorLeft = 0;
-                }*/
-                //else //does prompt cause problems with window resizing? if yes change to cursorxtotal + prompt.length above
-                {
-                    Console.CursorTop = tempPosY + (cursorXTotal + cursorXOffset) / Console.BufferWidth; // '/' discards remainder
-                    Console.CursorLeft = tempPosX + (cursorXTotal + cursorXOffset) % Console.BufferWidth;
-                }
+                Console.CursorTop = tempPosY + (cursorXTotal + cursorXOffset) / Console.BufferWidth; // '/' discards remainder
+                Console.CursorLeft = tempPosX + (cursorXTotal + cursorXOffset) % Console.BufferWidth;
             }
-        }
-
-        public void WriteLine(string text)
-        {
-            outputWriter.AddText(text);
         }
     }
 }

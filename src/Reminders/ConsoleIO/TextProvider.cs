@@ -8,9 +8,8 @@ namespace Reminders.ConsoleIO
         private IOutputWriter outputWriter;
         private ReminderManager reminderManager;
 
-        public TextProvider(IOutputWriter outputWriter, ReminderManager reminderManager)
+        public TextProvider(ReminderManager reminderManager)
         {
-            SetOutputWriter(outputWriter);
             this.reminderManager = reminderManager;
         }
 
