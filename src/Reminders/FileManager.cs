@@ -14,7 +14,7 @@ namespace Reminders
         private const string ConfigText = "path=default;\n" +
                                           "autostart=false;\n" +
                                           "upcomingreminderstime=3;";
-        private const int NumRmdrParams = 3;
+        private const int NumRmdrParams = 4;
 
         private OutputTextWriter writer;
 
@@ -200,9 +200,9 @@ namespace Reminders
             {
                 Reminder[] rmdrs = new Reminder[values.Length / NumRmdrParams];
 
-                for (int i = 0; i < values.Length; i += NumRmdrParams) //build reminders, they always consist of 3 (might change) values
+                for (int i = 0; i < values.Length; i += NumRmdrParams) //build reminders, they always consist of 4 (might change) values
                 {
-                    Reminder r = new Reminder(values[i], int.Parse(values[i + 1]), values[i + 2]);
+                    Reminder r = new Reminder(values[i], values[i + 1], bool.Parse(values[i + 2]), values[i + 3]);
 
                     rmdrs[i / 3] = r;
                 }
@@ -221,14 +221,15 @@ namespace Reminders
 
         public bool SaveData()
         {
-            // structure of data file: YYYYMMDDhhmm;[0/1 <- repeat];[content];[newline]...
+            // structure of data file: YYYYMMDDhhmm;[repeat];[read];[content];[newline]...
 
             string dataText = "";
 
             foreach (Reminder r in reminders) //assumes reminders do not contain any errors
             {
                 dataText += r.Date.ToString("yyyyMMddHHmm") + ";" +
-                            r.Repeat + ";";
+                            r.Repeat + ";" +
+                            r.Read + ";";
 
                 string content = r.Content;
                 StringBuilder sb = new StringBuilder(content.Length);
