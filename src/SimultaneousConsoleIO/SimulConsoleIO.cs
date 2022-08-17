@@ -15,7 +15,7 @@ namespace SimultaneousConsoleIO
         private List<string> history = new List<string>();
 
         public IOutputWriter OutputWriter { get => outputWriter; set => outputWriter = value; }
-        public ITextProvider TextProvider { get => textProvider; set => textProvider = value; }
+        public ITextProvider TextProvider { get => textProvider; set { textProvider = value; AddOutputWriterToTextProvider(); } } // get can return null
         public string PromptDefault { get => promptDefault; set => promptDefault = value; }
         public int SleepTime { get => sleepTime; set => sleepTime = value; }
 
@@ -25,7 +25,7 @@ namespace SimultaneousConsoleIO
             this.textProvider = textProvider;
             this.promptDefault = promptDefault;
 
-            textProvider.SetOutputWriter(outputWriter);
+            AddOutputWriterToTextProvider();
         }
 
         public SimulConsoleIO(IOutputWriter outputWriter, ITextProvider textProvider)
@@ -399,6 +399,12 @@ namespace SimultaneousConsoleIO
                 Console.CursorTop = tempPosY + (cursorXTotal + cursorXOffset) / Console.BufferWidth; // '/' discards remainder
                 Console.CursorLeft = tempPosX + (cursorXTotal + cursorXOffset) % Console.BufferWidth;
             }
+        }
+
+        private void AddOutputWriterToTextProvider()
+        {
+            if (textProvider != null)
+                textProvider.SetOutputWriter(outputWriter);
         }
     }
 }

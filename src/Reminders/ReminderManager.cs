@@ -20,10 +20,14 @@ namespace Reminders
             fileMgr = new FileManager(writer);
 
             upcomingDays = fileMgr.UpcomingDays;
-            reminders = fileMgr.Reminders.ToList(); //works if array is empty?
+
+            if (fileMgr.Reminders != null)
+                reminders = fileMgr.Reminders.ToList();
+            else
+                reminders = new List<Reminder>();
 
             idIterator = 0;
-
+            
             foreach (Reminder r in reminders)
             {
                 r.Id = idIterator;
@@ -31,12 +35,55 @@ namespace Reminders
             }
         }
 
-        public List<Reminder> GetRemindersDueOnDate(DateTime date)
+        // updates date of reminder to next date if repeat is enabled
+        public void SetReminderToNextDate(int id)
         {
-            return GetRemindersDueinTimespan(date, date);
+            Reminder r = ReadReminder(id);
+
+            if (r.Repeat != "0")
+            {
+                string s = r.Repeat;
+                int time = int.Parse(s.Remove(s.Length - 1).Replace("mi", ""));
+
+                if (s.Contains("min"))
+                {
+                    r.Date.AddMinutes(time);
+                }
+                if (s.Contains("h"))
+                {
+                    r.Date.AddHours(time);
+                }
+                else if (s.Contains("d"))
+                {
+                    r.Date.AddDays(time);
+                }
+                else if (s.Contains("m"))
+                {
+                    r.Date.AddMonths(time);
+                }
+                else if (s.Contains("y"))
+                {
+                    r.Date.AddYears(time);
+                }
+                else
+                {
+                    //error
+                }
+            }
         }
 
-        public List<Reminder> GetRemindersDueinTimespan(DateTime start, DateTime end)
+        // marks reminders as read / not read
+        public void MarkReminder(int id, bool read)
+        {
+            ReadReminder(id).Read = read;
+        }
+
+        public List<Reminder> GetRemindersDueOnDate(DateTime date)
+        {
+            return GetRemindersDueInTimespan(date, date);
+        }
+
+        public List<Reminder> GetRemindersDueInTimespan(DateTime start, DateTime end)
         {
             List<Reminder> rmndrs = new List<Reminder>();
             
@@ -49,7 +96,6 @@ namespace Reminders
                     rmndrs.Add(r);
                 }
             }
-
             return rmndrs;
         }
 
@@ -66,7 +112,6 @@ namespace Reminders
                     rmndrs.Add(r);
                 }
             }
-            
             return rmndrs;
         }
 
@@ -98,7 +143,7 @@ namespace Reminders
             }
         }
 
-        public int CreateReminder(string dateString, int repeat, string content)
+        public int CreateReminder(string dateString, string repeat, string content)
         {
             Reminder r = new Reminder(dateString, repeat, content);
 
@@ -155,5 +200,6 @@ namespace Reminders
         }
 
         public int UpcomingDays { get => upcomingDays; set => upcomingDays = value; }
+        public List<Reminder> Reminders { get => reminders; }
     }
 }

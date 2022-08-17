@@ -47,11 +47,11 @@ namespace Reminders
             return id + ": " + date.ToShortDateString() + " " + repeat + " " + content;
         }
 
-        public string Content { get; set; }
+        public string Content { get => content; set => content = value; }
         public string DateString { get => dateString; set { dateString = value; ConvertStringToDate(); } }
-        public string Repeat { get; set; }
-        public bool Read { get; set; }
+        public string Repeat { get => repeat; set => repeat = value; }
+        public bool Read { get => read; set => read = value; }
         public DateTime Date { get => date; set { date = value; ConvertDateToString(); } }
-        public int Id { get; set; }
+        public int Id { get => id; set => id = value; }
     }
 }

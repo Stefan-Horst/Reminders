@@ -16,9 +16,8 @@ namespace Reminders
         private static OutputTextWriter writer; //call this from remindermanager or commandexecuter (if even needed at all)
         private static ReminderManager reminderMgr;
         private static CommandExecutor cmdExec;
-        private static Queue<string> outputTextQueue = new Queue<string>();
-        private static bool breakFlag = false;
-        private static StringBuilder cmdInput = new StringBuilder();
+        /*private static Queue<string> outputTextQueue = new Queue<string>();
+        private static StringBuilder cmdInput = new StringBuilder();*/
 
         public static void Main()
         {
@@ -40,14 +39,15 @@ namespace Reminders
             Console.OutputEncoding = Encoding.Unicode;
 
             outputWriter = new OutputWriter(); //problem of circular dependency?
-            writer = new OutputTextWriter(outputWriter);
+            SimulConsoleIO simio = new SimulConsoleIO(outputWriter);
+            writer = new OutputTextWriter(simio);
+            reminderMgr = new ReminderManager(writer);
+            simio.TextProvider = new TextProvider(reminderMgr);
+            cmdExec = new CommandExecutor(writer, reminderMgr);
 
             DisableQuickEdit dqe = new DisableQuickEdit();
             if (!dqe.Disable())
                 writer.ShowError(0, ""); //TODO give user info that console wont get updated if he clicks anywhere in it
-
-            reminderMgr = new ReminderManager(writer);
-            cmdExec = new CommandExecutor(writer, reminderMgr);
 
             writer.ShowWelcome(); //todo 2 methods first only void, add args of method to config (or data?)
             writer.ShowWelcomeReminders(reminderMgr.UpcomingDays, "");
@@ -58,9 +58,8 @@ namespace Reminders
                      Console.WriteLine("g");
                  //Thread.Sleep(25);
              }*/
-            SimulConsoleIO simio = new SimulConsoleIO(outputWriter, new TextProvider(outputWriter, reminderMgr));
 
-            Task.Run(() => {
+            /*Task.Run(() => {
                 int i = 0;
                 while (true)
                 {
@@ -68,10 +67,10 @@ namespace Reminders
                     i++;
                     Thread.Sleep(5000);
                 }
-            });
+            });*/
 
             while (true)
-                simio.ReadLine(""); //use keyavailable there so readline doesnt block and output doesnt need extra thread
+                cmdExec.Execute(simio.ReadLine("")); //use keyavailable there so readline doesnt block and output doesnt need extra thread
         }
 
 
