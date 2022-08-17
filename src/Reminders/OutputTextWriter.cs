@@ -1,21 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using SimultaneousConsoleIO;
 
 namespace Reminders
 {
     class OutputTextWriter //call class "outputtext"?
     {
-        private IOutputWriter outputWriter;
+        private SimulConsoleIO simio;
         
-        public OutputTextWriter (IOutputWriter outputWriter)
+        public OutputTextWriter (SimulConsoleIO simio)
         {
-            this.outputWriter = outputWriter;
+            this.simio = simio;
         }
         
         public void ShowWelcome() //todo split into two first one only logo
         {
             // ASCII text from https://patorjk.com/software/taag/#p=display&h=3&v=0&f=Standard
-            Console.WriteLine("=======================================================    " + Environment.NewLine +
+            simio.WriteLine("=======================================================    " + Environment.NewLine +
                               "=   ____                _           _                 =    " + Environment.NewLine +
                               "=  |  _ \\ ___ _ __ ___ (_)_ __   __| | ___ _ __ ___   =   " + Environment.NewLine +
                               "=  | |_) / _ | '_ ` _ \\| | '_ \\ / _` |/ _ | '__/ __|  =  " + Environment.NewLine +
@@ -24,49 +25,55 @@ namespace Reminders
                               "=                                                     =    " + Environment.NewLine +
                               "=======================================================    " + Environment.NewLine);
 
-            Console.WriteLine("Welcome to Reminders! Today's date is: " + DateTime.Today.ToShortDateString());
+            simio.WriteLine("Welcome to Reminders! Today's date is: " + DateTime.Today.ToShortDateString());
         }
 
         public void ShowWelcomeReminders(int days, string reminders)
         {
-            Console.WriteLine("Here is everything for the next {0} days:", FormatTime(days)); //todo alt text for 0 or 1 day
-            Console.WriteLine(GetUpcomingRemindersRaw(reminders));
+            simio.WriteLine("Here is everything for the next " + FormatTime(days) + ":");
+            simio.WriteLine(GetUpcomingRemindersRaw(reminders));
         }
 
         public void CreateReminder()
         {
-            Console.WriteLine("");
+            simio.WriteLine("");
 
         }
 
-        public void DeleteReminder()
+        public void DeleteReminder(Reminder r)
         {
-            Console.WriteLine("");
+            simio.WriteLine("");
 
         }
 
-        public void ShowReminder()
+        public void ShowReminder(Reminder r)
         {
-            Console.WriteLine("");
-
+            simio.WriteLine(r.ToString());
         }
 
         // only show upcoming reminders like in the welcome message
         public void ShowUpcomingReminders(int days, string reminders)
         {
-            Console.WriteLine("Reminders for the next {0}:", FormatTime(days));
-            Console.WriteLine(GetUpcomingRemindersRaw(reminders));
+            simio.WriteLine("Reminders for the next " + FormatTime(days) + ":");
+            simio.WriteLine(GetUpcomingRemindersRaw(reminders));
         }
 
-        public void ShowAllReminders()
+        public void ListReminders(List<Reminder> reminders)
         {
-            Console.WriteLine("");
+            foreach (Reminder r in reminders)
+            {
+                string s = r.ToString();
 
+                if (s.Length > Console.BufferWidth && ! (s.Length - r.Content.Length > Console.BufferWidth))
+                    s = s.Remove(Console.BufferWidth); // trim content so that each reminder is not longer than one line in console
+
+                simio.WriteLine(s);
+            }
         }
 
         public void UpdateReminder()
         {
-            Console.WriteLine("");
+            simio.WriteLine("");
 
         }
 
@@ -75,10 +82,10 @@ namespace Reminders
             switch (type)
             {
                 case 0:
-                    Console.WriteLine("");
+                    simio.WriteLine("");
                     break;
                 case 2:
-                    Console.WriteLine("log");
+                    simio.WriteLine("log");
                     break;
                 default:
                     return; //add error message but only for development mode not the user in general
@@ -88,14 +95,14 @@ namespace Reminders
         // shows error messages for the different possible errors caused directly by user input
         public void ShowError(int type, string info) //use outputwriter here
         {
-            Console.WriteLine("ERROR");
+            simio.WriteLine("ERROR");
             switch (type)
             {
                 case 0:
-                    Console.WriteLine("");
+                    simio.WriteLine(info);
                     break;
                 case 2:
-                    Console.WriteLine("error" + info);
+                    simio.WriteLine("error" + info);
                     break;
                 default:
                     return; //add error message but only for development mode not the user in general
@@ -104,7 +111,12 @@ namespace Reminders
 
         public void ShowHelp()
         {
-            Console.WriteLine("todo help");
+            simio.WriteLine("todo help");
+        }
+
+        public void ShowCommands()
+        {
+            simio.WriteLine("todo command list");
         }
 
         // converts amount of days in weeks or months if possible
