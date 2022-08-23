@@ -119,6 +119,7 @@ namespace Reminders.util
             }
         }
 
+        //maybe add support for full words: day, week, etc
         public bool IsTimespanValid(string timespan, out int time) // also used for repeat
         {
             time = -1;

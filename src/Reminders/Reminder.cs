@@ -47,7 +47,7 @@ namespace Reminders
 
         public override string ToString()
         {
-            return id + ": " + date.ToShortDateString() + " " + repeat + " " + content;
+            return id + ": " + date.ToShortDateString() + " " + date.ToShortTimeString() + " " + repeat + " " + content;
         }
 
         public string Content { get => content; set => content = value; }

@@ -122,11 +122,29 @@ namespace Reminders
                     return;
                 }
 
-                string text;
-                string time;
-                string repeat;
+                string repeat = "0";
+                int i = 2;
+                
+                if (validator.IsTimeValid(tokens[i], out string time))
+                    i++;
+                else
+                    time = "0000";
+                
+                if (validator.IsTimespanValid(tokens[i], out _))
+                {
+                    repeat = tokens[i];
+                    i++;
+                }
 
-                if (tokens.Length == 5)
+                StringBuilder sb = new StringBuilder();
+                sb.Append(tokens[i]);
+
+                for (int j = i + 1; j < tokens.Length; j++)
+                {
+                    sb.Append(" " + tokens[j]);
+                }
+
+                /*if (tokens.Length == 5)
                 {
                     if (! validator.IsTimeValid(tokens[2], out time))
                     {
@@ -169,9 +187,9 @@ namespace Reminders
                 {
                     writer.ShowError(0, "missing args");
                     return;
-                }
+                }*/
                 //if (IsDateValid(date, out string date1) && IsTimeValid(time, out string time1) && IsTimespanValid(repeat, out _))
-                reminderMgr.CreateReminder(date + time, repeat, text);
+                reminderMgr.CreateReminder(date + time, repeat, sb.ToString());
             }
             catch (Exception ex)
             {
@@ -273,7 +291,7 @@ namespace Reminders
                                 terms.Add(tokens[i]);
                                 continue;
                             }
-                            else if (string.Join("", tokens[i..]).Contains('"')) // make sure there is a second " in a later token
+                            if (string.Join("", tokens[i..]).Contains('"')) // make sure there is a second " in a later token
                             {
                                 while (! tokens[i].EndsWith('"')) // exception possible if no second "
                                 {
