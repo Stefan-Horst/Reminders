@@ -9,7 +9,7 @@ using SimultaneousConsoleIO;
 
 namespace Reminders
 {
-    class Program
+    public class Program
     {
         //maybe let user change timeout value in config?
         private static IOutputWriter outputWriter;
@@ -34,7 +34,7 @@ namespace Reminders
             }
         }
 
-        public static void Init()
+        private static void Init()
         {
             Console.OutputEncoding = Encoding.Unicode;
 
@@ -74,7 +74,7 @@ namespace Reminders
         }
 
 
-        public static void Test() //method only temporary
+        private static void Test() //method only temporary
         {
             Console.OutputEncoding = Encoding.Unicode;
 

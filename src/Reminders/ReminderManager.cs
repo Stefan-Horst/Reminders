@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Reminders
 {
-    class ReminderManager
+    public class ReminderManager
     {
         private OutputTextWriter writer;
         private FileManager fileMgr;
@@ -47,23 +47,23 @@ namespace Reminders
 
                 if (s.Contains("min"))
                 {
-                    r.Date.AddMinutes(time);
+                    r.Date = r.Date.AddMinutes(time);
                 }
                 if (s.Contains("h"))
                 {
-                    r.Date.AddHours(time);
+                    r.Date = r.Date.AddHours(time);
                 }
                 else if (s.Contains("d"))
                 {
-                    r.Date.AddDays(time);
+                    r.Date = r.Date.AddDays(time);
                 }
                 else if (s.Contains("m"))
                 {
-                    r.Date.AddMonths(time);
+                    r.Date = r.Date.AddMonths(time);
                 }
                 else if (s.Contains("y"))
                 {
-                    r.Date.AddYears(time);
+                    r.Date = r.Date.AddYears(time);
                 }
                 else
                 {
@@ -138,7 +138,7 @@ namespace Reminders
             }
             else
             {
-                Console.WriteLine("ERROR"); //todo use outputwriter / do in program or cmdexec
+                writer.ShowError(0, "readreminder failed");
                 throw new InvalidOperationException("No Reminder with ID " + id + " found.");
             }
         }
@@ -147,12 +147,12 @@ namespace Reminders
         {
             Reminder r = new Reminder(dateString, repeat, content);
 
-            if(r.Date == null) //maybe add more checks for errors, SHOULD BE NULL OR THROW EXC IN REMINDER?
+            /*if(r.Date == null) //maybe add more checks for errors, SHOULD BE NULL OR THROW EXC IN REMINDER?
             {
                 Console.WriteLine("ERROR"); //todo use outputwriter
                 //return false;
                 throw new FormatException("Parameter \"dateString\"(" + dateString + ") has invalid format.");
-            }
+            }*/
 
             r.Id = idIterator;
             idIterator++;
@@ -175,7 +175,7 @@ namespace Reminders
             }
             else
             {
-                Console.WriteLine("ERROR"); //todo use outputwriter
+                writer.ShowError(0, "deletereminder failed");
                 //return false;
                 throw new InvalidOperationException("No Reminder with ID " + id + " found.");
             }
@@ -193,7 +193,7 @@ namespace Reminders
             }
             else
             {
-                Console.WriteLine("ERROR"); //todo use outputwriter
+                writer.ShowError(0, "updatereminder failed");
                 //return false;
                 throw new InvalidOperationException("No Reminder with ID " + id + " found.");
             }

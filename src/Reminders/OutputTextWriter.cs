@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using Reminders.util;
 using SimultaneousConsoleIO;
 
 namespace Reminders
 {
-    class OutputTextWriter //call class "outputtext"?
+    public class OutputTextWriter //call class "outputtext"?
     {
         private SimulConsoleIO simio;
+
+        private ConverterFormatter converter = new ConverterFormatter();
         
         public OutputTextWriter (SimulConsoleIO simio)
         {
@@ -30,7 +33,7 @@ namespace Reminders
 
         public void ShowWelcomeReminders(int days, string reminders)
         {
-            simio.WriteLine("Here is everything for the next " + FormatTime(days) + ":");
+            simio.WriteLine("Here is everything for the next " + converter.FormatTime(days) + ":");
             simio.WriteLine(GetUpcomingRemindersRaw(reminders));
         }
 
@@ -54,7 +57,7 @@ namespace Reminders
         // only show upcoming reminders like in the welcome message
         public void ShowUpcomingReminders(int days, string reminders)
         {
-            simio.WriteLine("Reminders for the next " + FormatTime(days) + ":");
+            simio.WriteLine("Reminders for the next " + converter.FormatTime(days) + ":");
             simio.WriteLine(GetUpcomingRemindersRaw(reminders));
         }
 
@@ -117,37 +120,6 @@ namespace Reminders
         public void ShowCommands()
         {
             simio.WriteLine("todo command list");
-        }
-
-        // converts amount of days in weeks or months if possible
-        private string FormatTime(int days)
-        {
-            string s;
-            
-            if (days % 7 == 0)
-            {
-                if (days / 7 > 1)
-                    s = days / 7 + " weeks";
-                else
-                    s = "week";
-            }
-            // assuming a month has exactly 30 days
-            else if (days % 30 == 0)
-            {
-                if (days / 30 > 1)
-                    s = days / 30 + " months";
-                else
-                    s = "month";
-            }
-            else
-            {
-                if (days > 1)
-                    s = days + " days";
-                else
-                    s = "day";
-            }
-
-            return s;
         }
 
         private string GetUpcomingRemindersRaw(string reminders) //reminder as string or array, should already be correct amount for time, this method is only for formatting

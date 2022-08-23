@@ -2,17 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Reminders.util;
 
 namespace Reminders
 {
     //taking the commands from the cmd and delegating logic to remindermanager and output to outputtextwriter
     // problem: remindermanager has some standalone tasks like the welcome message at program start, should it be called from here (not fitting) or separately from main
-    class CommandExecutor
+    public class CommandExecutor
     {
         private OutputTextWriter writer;
         private ReminderManager reminderMgr;
 
         private string[] tokens; //current user input tokenized
+
+        private ConverterFormatter converter = new ConverterFormatter();
+        private Validator validator = new Validator();
 
         // todo cache reminders from last show etc command with easier access ids
 
@@ -112,7 +116,7 @@ namespace Reminders
         {
             try
             {
-                if (! IsDateValid(tokens[1], out string date))
+                if (! validator.IsDateValid(tokens[1], out string date))
                 {
                     writer.ShowError(0, "wrong date arg");
                     return;
@@ -124,12 +128,12 @@ namespace Reminders
 
                 if (tokens.Length == 5)
                 {
-                    if (! IsTimeValid(tokens[2], out time))
+                    if (! validator.IsTimeValid(tokens[2], out time))
                     {
                         writer.ShowError(0, "wrong time arg");
                         return;
                     }
-                    if (! IsTimespanValid(tokens[3], out _))
+                    if (! validator.IsTimespanValid(tokens[3], out _))
                     {
                         writer.ShowError(0, "wrong date arg");
                         return;
@@ -139,11 +143,11 @@ namespace Reminders
                 }
                 else if (tokens.Length == 4)
                 {
-                    if (IsTimeValid(tokens[2], out time))
+                    if (validator.IsTimeValid(tokens[2], out time))
                     {
                         repeat = "0";
                     }
-                    else if (IsTimespanValid(tokens[2], out _))
+                    else if (validator.IsTimespanValid(tokens[2], out _))
                     {
                         time = "0000";
                         repeat = tokens[2];
@@ -171,7 +175,7 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                Console.WriteLine("SSS");
+                //Console.WriteLine("SSS");
                 writer.ShowError(0, ex.Message);
             }
         }
@@ -215,16 +219,16 @@ namespace Reminders
 
                     if (int.TryParse(s, out _)) //maybe not needed
                     {
-                        if (IsDateValid(s, out string date)) //date
+                        if (validator.IsDateValid(s, out string date)) //date
                         {
                             r.DateString = date + r.Date.ToString("HHmm");
                         }
-                        else if (IsTimeValid(s, out string time)) //time
+                        else if (validator.IsTimeValid(s, out string time)) //time
                         {
                             r.DateString = r.DateString.Remove(6) + time;
                         }
                     }
-                    else if (IsTimespanValid(s, out _)) //repeat
+                    else if (validator.IsTimespanValid(s, out _)) //repeat
                     {
                         r.Repeat = s;
                     }
@@ -309,7 +313,7 @@ namespace Reminders
         }
 
         //command: show unread startdate enddate / date / last timespan
-        //command structure: show[/s] ([un]read[/[u/]r]) (s{dd(.)mm(.)(yy)yy)}) (e{dd(.)mm(.)(yy)yy)})  /  show[/s] ([un]read) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]/yesterday[/y](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]
+        //command structure: show[/s] ([un]read[/[u/]r]) (s{dd(.)mm(.)(yy)yy)}) (e{dd(.)mm(.)(yy)yy)})  /  show[/s] ([un]read) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]/yesterday[/ye](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]
         private void CmdShow()
         {
             // show full text or only preview in list when multiple reminders are shown?
@@ -336,27 +340,27 @@ namespace Reminders
                     }
 
                     string s = tokens[i]/*.Replace(".", "")*/; //replace only necessary for dates
-                    if (IsDateValid(s, out string date1)) //startdate
+                    if (validator.IsDateValid(s, out string date1)) //startdate
                     {
                         string e = tokens[i + 1]/*.Replace(".", "")*/;
-                        if (IsDateValid(e, out string date2)) //enddate
+                        if (validator.IsDateValid(e, out string date2)) //enddate
                         {
                             if (read == 2)
-                                writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(ConvertStringToDate(date1), ConvertStringToDate(date2)));
+                                writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(converter.ConvertStringToDate(date1), converter.ConvertStringToDate(date2)));
                             else
-                                writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(ConvertStringToDate(date1), ConvertStringToDate(date2)).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                                writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(converter.ConvertStringToDate(date1), converter.ConvertStringToDate(date2)).FindAll(r => r.Read == Convert.ToBoolean(read)));
 
                             return;
                         }
 
                         if (read == 2)
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(ConvertStringToDate(date1)));
+                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(converter.ConvertStringToDate(date1)));
                         else
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(ConvertStringToDate(date1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(converter.ConvertStringToDate(date1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
 
                         return;
                     }
-                    else if (s == "today" || s == "t")
+                    if (s == "today" || s == "t")
                     {
                         if (read == 2)
                             writer.ListReminders(reminderMgr.GetRemindersDueOnDate(DateTime.Today));
@@ -365,7 +369,7 @@ namespace Reminders
 
                         return;
                     }
-                    else if (s == "tomorrow" || s == "to")
+                    if (s == "tomorrow" || s == "to")
                     {
                         if (read == 2)
                             writer.ListReminders(reminderMgr.GetRemindersDueOnDate(DateTime.Today.AddDays(1)));
@@ -374,7 +378,7 @@ namespace Reminders
 
                         return;
                     }
-                    else if (s == "yesterday" || s == "ye")
+                    if (s == "yesterday" || s == "ye")
                     {
                         if (read == 2)
                             writer.ListReminders(reminderMgr.GetRemindersDueOnDate(DateTime.Today.AddDays(-1)));
@@ -413,7 +417,7 @@ namespace Reminders
                         else
                             date = DateTime.Today.AddYears(1);
                     }
-                    else if (IsTimespanValid(tokens[i], out int time) && time != 0) //timespan
+                    else if (validator.IsTimespanValid(tokens[i], out int time) && time != 0) //timespan
                     {
                         /*DateTime date = DateTime.Today.AddMinutes(-ConvertToMinutes(tokens[i], time));
 
@@ -433,9 +437,9 @@ namespace Reminders
                         }*/
 
                         if (last)
-                            date = DateTime.Today.AddMinutes(-ConvertToMinutes(tokens[i], time));
+                            date = DateTime.Today.AddMinutes(-converter.ConvertToMinutes(tokens[i], time));
                         else
-                            date = DateTime.Today.AddMinutes(ConvertToMinutes(tokens[i], time));
+                            date = DateTime.Today.AddMinutes(converter.ConvertToMinutes(tokens[i], time));
                     }
                     else
                     {
@@ -469,188 +473,6 @@ namespace Reminders
         private void CmdSettings()
         {
 
-        }
-
-        private int ConvertToMinutes(string raw, int time)
-        {
-            if (raw.Contains("min"))
-            {
-                return time;
-            }
-            if (raw.Contains("h"))
-            {
-                return time *= 60;
-            }
-            else if (raw.Contains("d"))
-            {
-                return time *= 60 * 24;
-            }
-            else if (raw.Contains("m"))
-            {
-                return time *= 60 * 24 * 30;
-            }
-            else if (raw.Contains("y"))
-            {
-                return time *= 60 * 24 * 30 * 12;
-            }
-            else 
-            {
-                return -1;
-            }
-        }
-
-        /*private bool IsDateValid(string date)
-        {
-            try
-            {
-                int day = -1;
-                int month = -1;
-                int year = -1;
-
-                if (date.Length == 8)
-                {
-                    day = int.Parse(date[..2]);
-                    month = int.Parse(date.Substring(2, 2));
-                    year = int.Parse(date.Substring(4, 4));
-                }
-                else if (date.Length == 6)
-                {
-                    day = int.Parse(date[..2]);
-                    month = int.Parse(date.Substring(2, 2));
-                    year = int.Parse(DateTime.Now.Year.ToString().Remove(2) + date.Substring(4, 2));
-                }
-                DateTime dt = new DateTime(year, month, day);
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }*/
-
-        private bool IsDateValid(string date, out string normalizedDate)
-        {
-            normalizedDate = null;
-
-            try
-            {
-                date = date.Replace(".", "");
-
-                if (date.Length == 6)
-                {
-                    date = date[..4] + DateTime.Now.Year.ToString().Remove(2) + date.Substring(4, 2);
-                }
-                else if (date.Length != 8)
-                {
-                    return false;
-                }
-                string dateFormat = "ddMMyyyy";
-
-                bool b = DateTime.TryParseExact(date, dateFormat, System.Globalization.DateTimeFormatInfo.InvariantInfo, System.Globalization.DateTimeStyles.None, out _);
-
-                if (b)
-                    normalizedDate = date;
-
-                return b;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        /*private bool IsTimeValid(string time)
-        {
-            try
-            {
-                int hour = -1;
-                int minute = -1;
-
-                if (time.Length == 4)
-                {
-                    hour = int.Parse(time[..2]);
-                    minute = int.Parse(time.Substring(2, 2));
-
-                    if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 60)
-                        return true;
-                }
-                return false;
-            }
-            catch
-            {
-                return false;
-            }
-        }*/
-
-        private bool IsTimeValid(string time, out string normalizedTime)
-        {
-            normalizedTime = null;
-
-            try
-            {
-                time = time.Replace(".", "").Replace(":", "");
-
-                if (time.Length == 3)
-                {
-                    time = "0" + time;
-                }
-                else if (time.Length != 4)
-                {
-                    return false;
-                }
-                string timeFormat = "HHmm";
-
-                bool b = DateTime.TryParseExact(time, timeFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _);
-
-                if (b)
-                    normalizedTime = time;
-
-                return b;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private bool IsTimespanValid(string timespan, out int time) // also used for repeat
-        {
-            time = -1;
-
-            if (timespan == "0")
-            {
-                time = 0;
-                return true;
-            }
-
-            try
-            {
-                if (! (timespan.Contains("h") || timespan.Contains("d") || timespan.Contains("m") || timespan.Contains("y") || timespan.Contains("n")))
-                    return false;
-
-                bool b = int.TryParse(timespan.Remove(timespan.Length - 1).Replace("mi", ""), out int t);
-
-                if (b && time >= 0) // 0d, 0w, etc. are acceptable timespans which just result in 0
-                {
-                    time = t;
-                    return true;
-                }
-                return false;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private DateTime ConvertStringToDate(string dateString)
-        {
-            int day = int.Parse(dateString[..2]);
-            int month = int.Parse(dateString.Substring(2, 2));
-            int year = int.Parse(dateString.Substring(4, 4));
-
-            return new DateTime(year, month, day);
         }
     }
 }

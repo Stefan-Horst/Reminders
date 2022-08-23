@@ -7,7 +7,7 @@ using Reminders.WinApi;
 
 namespace Reminders
 {
-    class FileManager
+    public class FileManager
     {
         private const string ConfigFile = "config.txt";
         private const int NumConfigArgs = 3;
@@ -155,8 +155,7 @@ namespace Reminders
 
             if (! LoadFile(appPath, dataFilename))
             {
-                //send error to textwriter
-
+                writer.ShowError(0, "loadfile failed");
                 return false;
             }
 
@@ -189,10 +188,9 @@ namespace Reminders
 
             string[] values = l.ToArray();
 
-            if ((values.Length ) % NumRmdrParams != 0) //+1 for the extra line which is removed next
+            if (values.Length % NumRmdrParams != 0) //+1 for the extra line which is removed next
             {
-                //send error to textwriter
-
+                writer.ShowError(0, "wrong amount of params");
                 return false;
             }
 
@@ -211,8 +209,7 @@ namespace Reminders
             }
             catch (Exception e)
             {
-                //send error to textwriter: config file is corrupted, wrong syntax used
-                Console.WriteLine(e.StackTrace);
+                writer.ShowError(0, "creation of reminders failed");
                 return false;
             }
 
@@ -265,7 +262,7 @@ namespace Reminders
             catch (Exception e)
             {
                 fileRaw = "ERROR";
-                Console.WriteLine(e.StackTrace);
+                writer.ShowError(0, "loadfile failed");
 
                 return false;
             }
@@ -282,7 +279,7 @@ namespace Reminders
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                writer.ShowError(0, "savefile failed");
 
                 return false;
             }
@@ -295,7 +292,7 @@ namespace Reminders
         {
             string s = "";
             if (reminders.Length > 0)
-                reminders[0].ToString();
+                s += reminders[0].ToString();
 
             if (reminders.Length > 1)
             {
