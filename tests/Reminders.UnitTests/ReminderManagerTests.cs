@@ -133,7 +133,7 @@ namespace Reminders.UnitTests
 
             List<Reminder> l = rm.GetRemindersDueOnDate(dt);
             string sa = string.Join(",", l.Select(i => i.DateString).ToArray());
-
+            
             Assert.AreEqual(se, sa);
         }
     }

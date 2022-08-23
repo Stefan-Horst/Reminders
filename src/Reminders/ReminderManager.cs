@@ -27,7 +27,7 @@ namespace Reminders
                 reminders = new List<Reminder>();
 
             idIterator = 0;
-            
+
             foreach (Reminder r in reminders)
             {
                 r.Id = idIterator;
@@ -49,6 +49,7 @@ namespace Reminders
                 {
                     r.Date = r.Date.AddMinutes(time);
                 }
+
                 if (s.Contains("h"))
                 {
                     r.Date = r.Date.AddHours(time);
@@ -86,9 +87,10 @@ namespace Reminders
         public List<Reminder> GetRemindersDueInTimespan(DateTime start, DateTime end)
         {
             List<Reminder> rmndrs = new List<Reminder>();
-            
+
             foreach (Reminder r in reminders)
-            {   //first checks if r will be due not after the end date, then checks if r will be due after the start date
+            {
+                //first checks if r will be due not after the end date, then checks if r will be due after the start date
                 //Console.WriteLine(r.Date.ToLongTimeString()+" "+end.ToLongTimeString());
                 //Console.WriteLine(GetRemainingTime(r.Id, end.Date) + " " + GetRemainingTime(r.Id, start.Date));
                 if (GetRemainingTime(r.Id, end) <= TimeSpan.Zero && GetRemainingTime(r.Id, start) >= TimeSpan.Zero)
@@ -96,6 +98,7 @@ namespace Reminders
                     rmndrs.Add(r);
                 }
             }
+
             return rmndrs;
         }
 
@@ -105,13 +108,14 @@ namespace Reminders
         {
             List<Reminder> rmndrs = new List<Reminder>();
 
-            foreach(Reminder r in reminders)
+            foreach (Reminder r in reminders)
             {
-                if(GetRemainingTime(r.Id, dueDate) <= TimeSpan.Zero)
+                if (GetRemainingTime(r.Id, dueDate) <= TimeSpan.Zero)
                 {
                     rmndrs.Add(r);
                 }
             }
+
             return rmndrs;
         }
 
@@ -131,7 +135,7 @@ namespace Reminders
         public Reminder ReadReminder(int id)
         {
             int i = reminders.FindIndex(r => r.Id == id);
-            
+
             if (i != -1) //value equals -1 if no index found
             {
                 return reminders[i];
@@ -166,8 +170,8 @@ namespace Reminders
         public void DeleteReminder(int id)
         {
             int i = reminders.FindIndex(r => r.Id == id);
-            
-            if(i != -1) //value equals -1 if no index found
+
+            if (i != -1) //value equals -1 if no index found
             {
                 reminders.RemoveAt(i);
                 fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
@@ -184,7 +188,7 @@ namespace Reminders
         public void UpdateReminder(int id, Reminder reminder)
         {
             int i = reminders.FindIndex(r => r.Id == id);
-            
+
             if (i != -1) //value equals -1 if no index found
             {
                 reminders[i] = reminder;

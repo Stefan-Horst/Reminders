@@ -22,7 +22,7 @@ namespace Reminders
             this.content = content;
             id = -1; //default id, must be set to unique id
 
-            converter.ConvertStringToDateTime(dateString); //todo check for right format of string
+            date = converter.ConvertStringToDateTime(dateString); //todo check for right format of string
         }
 
         public Reminder(string dateString, string repeat, string content)
@@ -51,7 +51,7 @@ namespace Reminders
         }
 
         public string Content { get => content; set => content = value; }
-        public string DateString { get => dateString; set { dateString = value; converter.ConvertStringToDate(value); } }
+        public string DateString { get => dateString; set { dateString = value; date = converter.ConvertStringToDate(value); } }
         public string Repeat { get => repeat; set => repeat = value; }
         public bool Read { get => read; set => read = value; }
         public DateTime Date { get => date; set { date = value; ConvertDateToString(); } }
