@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Reminders.util
 {
@@ -16,22 +14,24 @@ namespace Reminders.util
             {
                 return time *= 60;
             }
-            else if (raw.Contains("d"))
+            if (raw.Contains("d"))
             {
                 return time *= 60 * 24;
             }
-            else if (raw.Contains("m"))
+            if (raw.Contains("w"))
+            {
+                return time *= 60 * 24 * 7;
+            }
+            if (raw.Contains("m"))
             {
                 return time *= 60 * 24 * 30;
             }
-            else if (raw.Contains("y"))
+            if (raw.Contains("y"))
             {
                 return time *= 60 * 24 * 30 * 12;
             }
-            else
-            {
-                return -1;
-            }
+            
+            return -1;
         }
         
         // converts amount of days in weeks or months if possible
