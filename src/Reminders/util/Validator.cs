@@ -34,6 +34,7 @@ namespace Reminders.util
             }
         }*/
 
+        // valid format: dd.mm.yyyy / ddmmyyyy / dd.mm.yy / ddmmyy
         public bool IsDateValid(string date, out string normalizedDate)
         {
             normalizedDate = null;
@@ -88,6 +89,7 @@ namespace Reminders.util
             }
         }*/
 
+        // valid format: hh:mm / hh.mm / h:mm / h.mm
         public bool IsTimeValid(string time, out string normalizedTime)
         {
             normalizedTime = null;
@@ -119,27 +121,39 @@ namespace Reminders.util
             }
         }
 
-        //maybe add support for full words: day, week, etc
-        public bool IsTimespanValid(string timespan, out int time) // also used for repeat
+        // valid format (x: any number): xminute[s] / xhour[s] / xday[s] / xweek[s] / xmonth[s] / xyear[s] / xmin[s] / xh / xd / xw / xm / xy
+        public bool IsTimespanValid(string timespan/*, out int time*/) // also used for repeat
         {
-            time = -1;
+            //time = -1;
 
             if (timespan == "0")
             {
-                time = 0;
+                //time = 0;
                 return true;
             }
 
             try
             {
-                if (!(timespan.Contains("h") || timespan.Contains("d") || timespan.Contains("w") || timespan.Contains("m") || timespan.Contains("y")))
+                timespan = timespan.Replace("s", "");
+                
+                if (timespan.Contains("hour") || timespan.Contains("week") || timespan.Contains("year"))
+                    timespan = timespan.Remove(timespan.Length - 4);
+                else if (timespan.Contains("month"))
+                    timespan = timespan.Remove(timespan.Length - 5);
+                else if (timespan.Contains("minute"))
+                    timespan = timespan.Remove(timespan.Length - 6);
+                else if (timespan.Contains("day") || timespan.Contains("min"))
+                    timespan = timespan.Remove(timespan.Length - 3);
+                else if (timespan.Contains("h") || timespan.Contains("d") || timespan.Contains("w") || timespan.Contains("m") || timespan.Contains("y"))
+                    timespan = timespan.Remove(timespan.Length - 1);
+                else
                     return false;
-
-                bool b = int.TryParse(timespan.Remove(timespan.Length - 1).Replace("mi", ""), out int t);
+                
+                bool b = int.TryParse(timespan, out int t);
 
                 if (b && t >= 0) // 0d, 0w, etc. are acceptable timespans which just result in 0
                 {
-                    time = t;
+                    //time = t;
                     return true;
                 }
                 return false;
