@@ -1,9 +1,45 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Reminders.util
 {
     public class ConverterFormatter
     {
+        public string StandardizeTimespan(string timespan, out int time, out string unit)
+        {
+            Regex r = new Regex(@"(\d+)([a-zA-Z]+)");
+            Match m = r.Match(timespan);
+            
+            time = int.Parse(m.Groups[1].Value);
+            unit = m.Groups[2].Value;
+
+            if (time == 0)
+            {
+                unit = "";
+                return "0";
+            }
+
+            unit = unit.Replace("s", "");
+            
+            if (unit == "min")
+                unit = "minute";
+            else if (unit == "h")
+                unit = "hour";
+            else if (unit == "d")
+                unit = "day";
+            else if (unit == "w")
+                unit = "week";
+            else if (unit == "m")
+                unit = "month";
+            else if (unit == "y")
+                unit = "year";
+            
+            if (time > 1)
+                unit += "s";
+
+            return time + unit;
+        }
+        
         public int ConvertToMinutes(string raw, int time)
         {
             if (raw.Contains("min"))
@@ -28,7 +64,7 @@ namespace Reminders.util
             }
             if (raw.Contains("y"))
             {
-                return time *= 60 * 24 * 30 * 12;
+                return time *= 60 * 24 * 365;
             }
             
             return -1;
