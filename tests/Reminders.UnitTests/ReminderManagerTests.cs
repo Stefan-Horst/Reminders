@@ -13,14 +13,14 @@ namespace Reminders.UnitTests
     [TestClass]
     public class ReminderManagerTests
     {
-        const string TIME_FORMAT = @"d\.hh\:mm"; //(fractions of) seconds are not used due to their unreliability
-        const string TEST_DATE1 = "201220100101"; //20.12.2040 01:01:00 -> future
-        const string TEST_DATE2 = "201220200101"; //20.12.2030 01:01:00 -> future
-        const string TEST_DATE3 = "201220300101"; //20.12.2020 01:01:00 -> past
-        const string TEST_DATE4 = "201220400101"; //20.12.2010 01:01:00 -> past
+        private const string TIME_FORMAT = @"d\.hh\:mm"; //(fractions of) seconds are not used due to their unreliability
+        private const string TEST_DATE1 = "201220100101"; //20.12.2040 01:01:00 -> future
+        private const string TEST_DATE2 = "201220200101"; //20.12.2030 01:01:00 -> future
+        private const string TEST_DATE3 = "201220300101"; //20.12.2020 01:01:00 -> past
+        private const string TEST_DATE4 = "201220400101"; //20.12.2010 01:01:00 -> past
         //add test date with DateTime.Now?
 
-        ReminderManager rm;
+        private ReminderManager rm;
 
         [TestInitialize]
         public void Initialize()
@@ -63,7 +63,7 @@ namespace Reminders.UnitTests
         }
 
         [TestMethod]
-        public void GetRemainingTime1Param_StandardBehaviour_ReturnDateTime() //maybe just set seconds to 0 instead of tostring formatting
+        public void GetRemainingTime_1Param_StandardBehaviour() //maybe just set seconds to 0 instead of tostring formatting
         {
             int id = rm.CreateReminder(TEST_DATE4, "0", "reminder 1");
             TimeSpan expected = new DateTime(2040, 12, 20, 1, 1, 0).Subtract(DateTime.Now);
@@ -76,7 +76,7 @@ namespace Reminders.UnitTests
         }
 
         [TestMethod]
-        public void GetRemainingTime2Param_StandardBehaviour_ReturnDateTime()
+        public void GetRemainingTime_2Param_StandardBehaviour()
         {
             int id = rm.CreateReminder(TEST_DATE4, "0", "reminder 1");
             DateTime dt = new DateTime(2030, 10, 10, 1, 1, 0);
@@ -89,7 +89,7 @@ namespace Reminders.UnitTests
         }
 
         [TestMethod]
-        public void GetDueReminders_StandardBehaviour_ReturnReminders()
+        public void GetDueReminders_StandardBehaviour()
         {
             rm.CreateReminder(TEST_DATE1, "0", "reminder 1");
             rm.CreateReminder(TEST_DATE2, "0", "reminder 2");
@@ -105,7 +105,7 @@ namespace Reminders.UnitTests
         }
 
         [TestMethod]
-        public void GetRemindersDueInTimespan_StandardBehaviour_ReturnReminders()
+        public void GetRemindersDueInTimespan_StandardBehaviour()
         {
             rm.CreateReminder(TEST_DATE1, "0", "reminder 1");
             rm.CreateReminder(TEST_DATE2, "0", "reminder 2");
@@ -122,7 +122,7 @@ namespace Reminders.UnitTests
         }
 
         [TestMethod]
-        public void GetRemindersDueOnDate_StandardBehaviour_ReturnReminders()
+        public void GetRemindersDueOnDate_StandardBehaviour()
         {
             rm.CreateReminder(TEST_DATE1, "0", "reminder 1");
             rm.CreateReminder(TEST_DATE2, "0", "reminder 2");

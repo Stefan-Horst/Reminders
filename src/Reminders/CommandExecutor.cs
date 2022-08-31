@@ -130,9 +130,9 @@ namespace Reminders
                 else
                     time = "0000";
                 
-                if (validator.IsTimespanValid(tokens[i], out _))
+                if (validator.IsTimespanValid(tokens[i]/*, out _*/))
                 {
-                    repeat = tokens[i];
+                    repeat = converter.StandardizeTimespan(tokens[i], out _, out _);
                     i++;
                 }
 
@@ -235,20 +235,20 @@ namespace Reminders
                 {
                     string s = tokens[i]/*.Replace(".", "").Replace(":", "")*/;
 
-                    if (int.TryParse(s, out _)) //maybe not needed
+                    //if (int.TryParse(s, out _)) //maybe not needed
+                    //{
+                    if (validator.IsDateValid(s, out string date)) //date
                     {
-                        if (validator.IsDateValid(s, out string date)) //date
-                        {
-                            r.DateString = date + r.Date.ToString("HHmm");
-                        }
-                        else if (validator.IsTimeValid(s, out string time)) //time
-                        {
-                            r.DateString = r.DateString.Remove(6) + time;
-                        }
+                        r.DateString = date + r.Date.ToString("HHmm");
                     }
-                    else if (validator.IsTimespanValid(s, out _)) //repeat
+                    else if (validator.IsTimeValid(s, out string time)) //time
                     {
-                        r.Repeat = s;
+                        r.DateString = r.DateString.Remove(8) + time;
+                    }
+                    //}
+                    else if (validator.IsTimespanValid(s/*, out _*/)) //repeat
+                    {
+                        r.Repeat = converter.StandardizeTimespan(s, out _, out _);
                     }
                     else //content
                     {
@@ -259,8 +259,9 @@ namespace Reminders
                         {
                             sb.Append(" " + tokens[j]);
                         }
-
                         r.Content = sb.ToString();
+
+                        return;
                     }
                 }
             }
@@ -435,7 +436,7 @@ namespace Reminders
                         else
                             date = DateTime.Today.AddYears(1);
                     }
-                    else if (validator.IsTimespanValid(tokens[i], out int time) && time != 0) //timespan
+                    else if (validator.IsTimespanValid(tokens[i]/*, out int time) && time != 0*/)) //timespan
                     {
                         /*DateTime date = DateTime.Today.AddMinutes(-ConvertToMinutes(tokens[i], time));
 
@@ -453,11 +454,19 @@ namespace Reminders
                             else
                                 writer.ShowAllReminders(reminderMgr.GetRemindersDueInTimespan(DateTime.Today, date).FindAll(r => r.Read == Convert.ToBoolean(read)));
                         }*/
+                        converter.StandardizeTimespan(tokens[i], out int time, out _);
 
-                        if (last)
-                            date = DateTime.Today.AddMinutes(-converter.ConvertToMinutes(tokens[i], time));
+                        if (time != 0)
+                        {
+                            if (last)
+                                date = DateTime.Today.AddMinutes(-converter.ConvertToMinutes(tokens[i], time));
+                            else
+                                date = DateTime.Today.AddMinutes(converter.ConvertToMinutes(tokens[i], time));
+                        }
                         else
-                            date = DateTime.Today.AddMinutes(converter.ConvertToMinutes(tokens[i], time));
+                        {
+                            date = DateTime.Today;
+                        }
                     }
                     else
                     {

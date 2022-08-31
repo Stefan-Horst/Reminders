@@ -224,7 +224,7 @@ namespace Reminders
 
             foreach (Reminder r in reminders) //assumes reminders do not contain any errors
             {
-                dataText += r.Date.ToString("yyyyMMddHHmm") + ";" +
+                dataText += r.Date.ToString("ddMMyyyyHHmm") + ";" +
                             r.Repeat + ";" +
                             r.Read + ";";
 
