@@ -79,6 +79,11 @@ namespace Reminders
             simio.WriteLine("");
 
         }
+        
+        public string EditReminder(string content)
+        {
+            return simio.ReadLine("", content);
+        }
 
         public void ShowLog(int type) //use outputwriter here
         {

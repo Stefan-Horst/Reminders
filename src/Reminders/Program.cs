@@ -58,7 +58,7 @@ namespace Reminders
                      Console.WriteLine("g");
                  //Thread.Sleep(25);
              }*/
-
+            
             /*Task.Run(() => {
                 int i = 0;
                 while (true)

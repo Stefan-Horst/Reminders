@@ -57,9 +57,14 @@ namespace Reminders
                     CmdDelete();
                     break;
 
-                case "update":
+                case "update": // set any part of reminder to new value
                 case "u":
                     CmdUpdate();
+                    break;
+                
+                case "edit": // edit content of reminder
+                case "e":
+                    CmdEdit();
                     break;
 
                 case "search": // search for keyword
@@ -271,7 +276,28 @@ namespace Reminders
             }
         }
 
-        //comand: search term / "term1" "term2" ...
+        //command: edit id
+        //command structure: edit[/e] {id}
+        private void CmdEdit()
+        {
+            try
+            {
+               if (tokens.Length != 2)
+               {
+                   writer.ShowError(0, "wrong args");
+                   return;
+               }
+               
+               Reminder r = reminderMgr.ReadReminder(int.Parse(tokens[1]));
+               r.Content = writer.EditReminder(r.Content);;
+            }
+            catch (Exception ex)
+            {
+                writer.ShowError(0, ex.Message);
+            }
+        }
+
+        //command: search term / "term1" "term2" ...
         //command structure: search[/se] {term} ("{term2..n}")
         private void CmdSearch()
         {
