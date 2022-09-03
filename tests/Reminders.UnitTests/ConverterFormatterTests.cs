@@ -7,14 +7,6 @@ namespace Reminders.UnitTests
     [TestClass]
     public class ConverterFormatterTests
     {
-        private ConverterFormatter cv;
-
-        [TestInitialize]
-        public void Initialize()
-        {
-            cv = new ConverterFormatter();
-        }
-
         [TestMethod]
         public void StandardizeTimespan_StandardBehaviour()
         {
@@ -37,15 +29,15 @@ namespace Reminders.UnitTests
             string se05 = "years";
             string se06 = "minute";
             string se07 = "";
-            string sa = cv.StandardizeTimespan("10min", out int ia, out string sa0);
-            string sa1 = cv.StandardizeTimespan("10h", out int ia1, out string sa01);
-            string sa2 = cv.StandardizeTimespan("10d", out int ia2, out string sa02);
-            string sa3 = cv.StandardizeTimespan("10w", out int ia3, out string sa03);
-            string sa4 = cv.StandardizeTimespan("10m", out int ia4, out string sa04);
-            string sa5 = cv.StandardizeTimespan("10y", out int ia5, out string sa05);
-            string sa6 = cv.StandardizeTimespan("10mins", out int ia6, out string sa06);
-            string sa7 = cv.StandardizeTimespan("1min", out int ia7, out string sa07);
-            string sa8 = cv.StandardizeTimespan("0min", out int ia8, out string sa08);
+            string sa = ConverterFormatter.StandardizeTimespan("10min", out int ia, out string sa0);
+            string sa1 = ConverterFormatter.StandardizeTimespan("10h", out int ia1, out string sa01);
+            string sa2 = ConverterFormatter.StandardizeTimespan("10d", out int ia2, out string sa02);
+            string sa3 = ConverterFormatter.StandardizeTimespan("10w", out int ia3, out string sa03);
+            string sa4 = ConverterFormatter.StandardizeTimespan("10m", out int ia4, out string sa04);
+            string sa5 = ConverterFormatter.StandardizeTimespan("10y", out int ia5, out string sa05);
+            string sa6 = ConverterFormatter.StandardizeTimespan("10mins", out int ia6, out string sa06);
+            string sa7 = ConverterFormatter.StandardizeTimespan("1min", out int ia7, out string sa07);
+            string sa8 = ConverterFormatter.StandardizeTimespan("0min", out int ia8, out string sa08);
 
             Assert.AreEqual(se, sa);
             Assert.AreEqual(se1, sa1);
@@ -87,12 +79,12 @@ namespace Reminders.UnitTests
             int ie3 = 2*60*24*7;
             int ie4 = 2*60*24*30;
             int ie5 = 2*60*24*365;
-            int ia = cv.ConvertToMinutes("2min", 2);
-            int ia1 = cv.ConvertToMinutes("2h", 2);
-            int ia2 = cv.ConvertToMinutes("2d", 2);
-            int ia3 = cv.ConvertToMinutes("2w", 2);
-            int ia4 = cv.ConvertToMinutes("2m", 2);
-            int ia5 = cv.ConvertToMinutes("2y", 2);
+            int ia = ConverterFormatter.ConvertToMinutes("2min", 2);
+            int ia1 = ConverterFormatter.ConvertToMinutes("2h", 2);
+            int ia2 = ConverterFormatter.ConvertToMinutes("2d", 2);
+            int ia3 = ConverterFormatter.ConvertToMinutes("2w", 2);
+            int ia4 = ConverterFormatter.ConvertToMinutes("2m", 2);
+            int ia5 = ConverterFormatter.ConvertToMinutes("2y", 2);
             
             Assert.AreEqual(ie, ia);
             Assert.AreEqual(ie1, ia1);
@@ -111,12 +103,12 @@ namespace Reminders.UnitTests
             string se3 = "3 weeks";
             string se4 = "month";
             string se5 = "3 months";
-            string sa = cv.FormatTime(1);
-            string sa1 = cv.FormatTime(5);
-            string sa2 = cv.FormatTime(7);
-            string sa3 = cv.FormatTime(21);
-            string sa4 = cv.FormatTime(30);
-            string sa5 = cv.FormatTime(90);
+            string sa = ConverterFormatter.FormatTime(1);
+            string sa1 = ConverterFormatter.FormatTime(5);
+            string sa2 = ConverterFormatter.FormatTime(7);
+            string sa3 = ConverterFormatter.FormatTime(21);
+            string sa4 = ConverterFormatter.FormatTime(30);
+            string sa5 = ConverterFormatter.FormatTime(90);
 
             Assert.AreEqual(se, sa);
             Assert.AreEqual(se1, sa1);
@@ -131,8 +123,8 @@ namespace Reminders.UnitTests
         {
             DateTime de = new DateTime(2022, 12, 20);
             DateTime de1 = new DateTime(1999, 1, 1);
-            DateTime da = cv.ConvertStringToDate("20122022");
-            DateTime da1 = cv.ConvertStringToDate("01011999");
+            DateTime da = ConverterFormatter.ConvertStringToDate("20122022");
+            DateTime da1 = ConverterFormatter.ConvertStringToDate("01011999");
 
             Assert.AreEqual(de, da);
             Assert.AreEqual(de1, da1);
@@ -144,9 +136,9 @@ namespace Reminders.UnitTests
             DateTime de = new DateTime(2022, 12, 20, 23, 59, 0);
             DateTime de1 = new DateTime(1999, 1, 1, 1, 1, 0);
             DateTime de2 = new DateTime(2022, 12, 20, 0, 0, 0);
-            DateTime da = cv.ConvertStringToDateTime("201220222359");
-            DateTime da1 = cv.ConvertStringToDateTime("010119990101");
-            DateTime da2 = cv.ConvertStringToDateTime("201220220000");
+            DateTime da = ConverterFormatter.ConvertStringToDateTime("201220222359");
+            DateTime da1 = ConverterFormatter.ConvertStringToDateTime("010119990101");
+            DateTime da2 = ConverterFormatter.ConvertStringToDateTime("201220220000");
 
             Assert.AreEqual(de, da);
             Assert.AreEqual(de1, da1);

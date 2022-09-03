@@ -12,8 +12,6 @@ namespace Reminders
         private bool read; //false by default, true when user marks reminder as read
         private int id;
         
-        private ConverterFormatter converter = new ConverterFormatter();
-
         public Reminder(string dateString, string repeat, bool read, string content)
         {
             this.dateString = dateString;
@@ -22,7 +20,7 @@ namespace Reminders
             this.content = content;
             id = -1; //default id, must be set to unique id
 
-            date = converter.ConvertStringToDateTime(dateString);
+            date = ConverterFormatter.ConvertStringToDateTime(dateString);
         }
 
         public Reminder(string dateString, string repeat, string content)
@@ -51,7 +49,7 @@ namespace Reminders
         }
 
         public string Content { get => content; set => content = value; }
-        public string DateString { get => dateString; set { dateString = value; date = converter.ConvertStringToDateTime(value); } }
+        public string DateString { get => dateString; set { dateString = value; date = ConverterFormatter.ConvertStringToDateTime(value); } }
         public string Repeat { get => repeat; set => repeat = value; }
         public bool Read { get => read; set => read = value; }
         public DateTime Date { get => date; set { date = value; ConvertDateToString(); } }

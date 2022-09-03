@@ -8,8 +8,6 @@ namespace Reminders
     public class OutputTextWriter //call class "outputtext"?
     {
         private SimulConsoleIO simio;
-
-        private ConverterFormatter converter = new ConverterFormatter();
         
         public OutputTextWriter (SimulConsoleIO simio)
         {
@@ -33,7 +31,7 @@ namespace Reminders
 
         public void ShowWelcomeReminders(int days, string reminders)
         {
-            simio.WriteLine("Here is everything for the next " + converter.FormatTime(days) + ":");
+            simio.WriteLine("Here are all reminders for the next " + ConverterFormatter.FormatTime(days) + ":");
             simio.WriteLine(GetUpcomingRemindersRaw(reminders));
         }
 

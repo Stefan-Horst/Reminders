@@ -15,7 +15,6 @@ namespace Reminders
 
         private string[] tokens; //current user input tokenized
 
-        private ConverterFormatter converter = new ConverterFormatter();
         private Validator validator = new Validator();
 
         // todo cache reminders from last show etc command with easier access ids
@@ -135,9 +134,9 @@ namespace Reminders
                 else
                     time = "0000";
                 
-                if (validator.IsTimespanValid(tokens[i]/*, out _*/))
+                if (Validator.IsTimespanValid(tokens[i]/*, out _*/))
                 {
-                    repeat = converter.StandardizeTimespan(tokens[i], out _, out _);
+                    repeat = ConverterFormatter.StandardizeTimespan(tokens[i], out _, out _);
                     i++;
                 }
 
@@ -251,9 +250,9 @@ namespace Reminders
                         r.DateString = r.DateString.Remove(8) + time;
                     }
                     //}
-                    else if (validator.IsTimespanValid(s/*, out _*/)) //repeat
+                    else if (Validator.IsTimespanValid(s/*, out _*/)) //repeat
                     {
-                        r.Repeat = converter.StandardizeTimespan(s, out _, out _);
+                        r.Repeat = ConverterFormatter.StandardizeTimespan(s, out _, out _);
                     }
                     else //content
                     {
@@ -391,17 +390,17 @@ namespace Reminders
                         if (validator.IsDateValid(e, out string date2)) //enddate
                         {
                             if (read == 2)
-                                writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(converter.ConvertStringToDate(date1), converter.ConvertStringToDate(date2)));
+                                writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(ConverterFormatter.ConvertStringToDate(date1), ConverterFormatter.ConvertStringToDate(date2)));
                             else
-                                writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(converter.ConvertStringToDate(date1), converter.ConvertStringToDate(date2)).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                                writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(ConverterFormatter.ConvertStringToDate(date1), ConverterFormatter.ConvertStringToDate(date2)).FindAll(r => r.Read == Convert.ToBoolean(read)));
 
                             return;
                         }
 
                         if (read == 2)
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(converter.ConvertStringToDate(date1)));
+                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(ConverterFormatter.ConvertStringToDate(date1)));
                         else
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(converter.ConvertStringToDate(date1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(ConverterFormatter.ConvertStringToDate(date1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
 
                         return;
                     }
@@ -462,7 +461,7 @@ namespace Reminders
                         else
                             date = DateTime.Today.AddYears(1);
                     }
-                    else if (validator.IsTimespanValid(tokens[i]/*, out int time) && time != 0*/)) //timespan
+                    else if (Validator.IsTimespanValid(tokens[i]/*, out int time) && time != 0*/)) //timespan
                     {
                         /*DateTime date = DateTime.Today.AddMinutes(-ConvertToMinutes(tokens[i], time));
 
@@ -480,14 +479,14 @@ namespace Reminders
                             else
                                 writer.ShowAllReminders(reminderMgr.GetRemindersDueInTimespan(DateTime.Today, date).FindAll(r => r.Read == Convert.ToBoolean(read)));
                         }*/
-                        converter.StandardizeTimespan(tokens[i], out int time, out _);
+                        ConverterFormatter.StandardizeTimespan(tokens[i], out int time, out _);
 
                         if (time != 0)
                         {
                             if (last)
-                                date = DateTime.Today.AddMinutes(-converter.ConvertToMinutes(tokens[i], time));
+                                date = DateTime.Today.AddMinutes(-ConverterFormatter.ConvertToMinutes(tokens[i], time));
                             else
-                                date = DateTime.Today.AddMinutes(converter.ConvertToMinutes(tokens[i], time));
+                                date = DateTime.Today.AddMinutes(ConverterFormatter.ConvertToMinutes(tokens[i], time));
                         }
                         else
                         {

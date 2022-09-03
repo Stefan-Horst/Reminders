@@ -3,9 +3,9 @@ using System.Text.RegularExpressions;
 
 namespace Reminders.util
 {
-    public class ConverterFormatter
+    public static class ConverterFormatter
     {
-        public string StandardizeTimespan(string timespan, out int time, out string unit)
+        public static string StandardizeTimespan(string timespan, out int time, out string unit)
         {
             Regex r = new Regex(@"(\d+)([a-zA-Z]+)");
             Match m = r.Match(timespan);
@@ -40,7 +40,7 @@ namespace Reminders.util
             return time + unit;
         }
         
-        public int ConvertToMinutes(string raw, int time)
+        public static int ConvertToMinutes(string raw, int time)
         {
             if (raw.Contains("min"))
             {
@@ -48,30 +48,30 @@ namespace Reminders.util
             }
             if (raw.Contains("h"))
             {
-                return time *= 60;
+                return time * 60;
             }
             if (raw.Contains("d"))
             {
-                return time *= 60 * 24;
+                return time * 60 * 24;
             }
             if (raw.Contains("w"))
             {
-                return time *= 60 * 24 * 7;
+                return time * 60 * 24 * 7;
             }
             if (raw.Contains("m"))
             {
-                return time *= 60 * 24 * 30;
+                return time * 60 * 24 * 30;
             }
             if (raw.Contains("y"))
             {
-                return time *= 60 * 24 * 365;
+                return time * 60 * 24 * 365;
             }
             
             return -1;
         }
         
         // converts amount of days in weeks or months if possible
-        public string FormatTime(int days)
+        public static string FormatTime(int days)
         {
             string s;
             
@@ -101,7 +101,7 @@ namespace Reminders.util
             return s;
         }
 
-        public DateTime ConvertStringToDate(string dateString)
+        public static DateTime ConvertStringToDate(string dateString)
         {
             int day = int.Parse(dateString[..2]);
             int month = int.Parse(dateString.Substring(2, 2));
@@ -110,7 +110,7 @@ namespace Reminders.util
             return new DateTime(year, month, day);
         }
 
-        public DateTime ConvertStringToDateTime(string dateString)
+        public static DateTime ConvertStringToDateTime(string dateString)
         {
             //date format in string has to be DDMMYYYYhhmm
             int day = int.Parse(dateString[..2]);

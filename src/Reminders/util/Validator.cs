@@ -122,7 +122,7 @@ namespace Reminders.util
         }
 
         // valid format (x: any number): xminute[s] / xhour[s] / xday[s] / xweek[s] / xmonth[s] / xyear[s] / xmin[s] / xh / xd / xw / xm / xy
-        public bool IsTimespanValid(string timespan/*, out int time*/) // also used for repeat
+        public static bool IsTimespanValid(string timespan/*, out int time*/) // also used for repeat
         {
             //time = -1;
 
@@ -151,12 +151,8 @@ namespace Reminders.util
                 
                 bool b = int.TryParse(timespan, out int t);
 
-                if (b && t >= 0) // 0d, 0w, etc. are acceptable timespans which just result in 0
-                {
-                    //time = t;
-                    return true;
-                }
-                return false;
+                return b && t >= 0; // 0d, 0w, etc. are acceptable timespans which just result in 0
+                //time = t;
             }
             catch
             {
