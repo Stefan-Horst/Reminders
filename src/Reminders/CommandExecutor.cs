@@ -82,6 +82,10 @@ namespace Reminders
                 case "co":
                     CmdSettings();
                     break;
+                
+                case "exit":
+                    CmdExit();
+                    break;
 
                 case "":
                     break;
@@ -525,6 +529,12 @@ namespace Reminders
         private void CmdSettings()
         {
 
+        }
+
+        //command: exit
+        private void CmdExit()
+        {
+            Environment.Exit(0); //cleanup or saving needed before?
         }
     }
 }
