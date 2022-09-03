@@ -13,9 +13,9 @@ namespace Reminders.ConsoleIO
             this.reminderManager = reminderManager;
         }
 
-        public void SetOutputWriter(IOutputWriter outputWriter)
+        public void SetOutputWriter(IOutputWriter newOutputWriter)
         {
-            this.outputWriter = outputWriter;
+            outputWriter = newOutputWriter;
         }
 
         public void CheckForText()

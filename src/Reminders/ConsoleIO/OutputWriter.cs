@@ -4,25 +4,33 @@ using SimultaneousConsoleIO;
 
 namespace Reminders.ConsoleIO
 {
-    class OutputWriter : IOutputWriter //maybe let everybody call this class and only this then calls outputtextwriter? or just combine both output classes (modularity?)?
+    class OutputWriter : IOutputWriter
     {
-        public Queue<string> OutputTextQueue = new Queue<string>();
+        private Queue<string> outputTextQueue = new Queue<string>();
+        private string startText; // text which will be at beginning of all output
 
+        public string StartText { get => startText; set => startText = value; }
+
+        public OutputWriter(string startText = "")
+        {
+            this.startText = startText;
+        }
+        
         public void AddText(string text) 
         { 
-            OutputTextQueue.Enqueue(text); 
+            outputTextQueue.Enqueue(startText + text); 
         }
 
         public string GetText()
         {
             string s = "";
 
-            if (OutputTextQueue.Count > 0)
+            if (outputTextQueue.Count > 0)
             {
-                while (OutputTextQueue.Count > 1)
-                    s += OutputTextQueue.Dequeue() + Environment.NewLine;
+                while (outputTextQueue.Count > 1)
+                    s += outputTextQueue.Dequeue() + Environment.NewLine;
 
-                s += OutputTextQueue.Dequeue();
+                s += outputTextQueue.Dequeue();
             }
 
             return s;
