@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Reminders.util;
 
 namespace Reminders
 {
@@ -14,17 +15,32 @@ namespace Reminders
 
         private int idIterator; //no need for static as ids are assigned during (each) runtime
 
+        public int UpcomingDays { get => upcomingDays; set => upcomingDays = value; }
+        public List<Reminder> Reminders { get => reminders; }
+        public FileManager FileMgr { get => fileMgr; }
+        
         public ReminderManager(OutputTextWriter outputTextWriter)
         {
             writer = outputTextWriter;
-            fileMgr = new FileManager(writer);
 
+            try
+            {
+                fileMgr = new FileManager(writer);
+            }
+            catch (Exception ex)
+            {
+                writer.ShowError(0, ex.Message);
+                return; // fatal error, end program
+            }
+
+            Init();
+        }
+
+        private void Init()
+        {
             upcomingDays = fileMgr.UpcomingDays;
-
-            if (fileMgr.Reminders != null)
-                reminders = fileMgr.Reminders.ToList();
-            else
-                reminders = new List<Reminder>();
+            
+            reminders = fileMgr.Reminders != null ? fileMgr.Reminders.ToList() : new List<Reminder>();
 
             idIterator = 0;
 
@@ -39,36 +55,40 @@ namespace Reminders
         public void SetReminderToNextDate(int id)
         {
             Reminder r = ReadReminder(id);
-
+            
             if (r.Repeat != "0")
             {
-                string s = r.Repeat;
-                int time = int.Parse(s.Remove(s.Length - 1).Replace("mi", ""));
+                ConverterFormatter.StandardizeTimespan(r.Repeat, out int time, out string unit); //either here or somewhere else try catch needed
 
-                if (s.Contains("min"))
+                unit = unit.Replace("s", "");
+                
+                if (unit == "minute")
                 {
                     r.Date = r.Date.AddMinutes(time);
                 }
-
-                if (s.Contains("h"))
+                else if (unit == "hour")
                 {
                     r.Date = r.Date.AddHours(time);
                 }
-                else if (s.Contains("d"))
+                else if (unit == "day")
                 {
                     r.Date = r.Date.AddDays(time);
                 }
-                else if (s.Contains("m"))
+                else if (unit == "week")
+                {
+                    r.Date = r.Date.AddDays(time * 7);
+                }
+                else if (unit == "month")
                 {
                     r.Date = r.Date.AddMonths(time);
                 }
-                else if (s.Contains("y"))
+                else if (unit == "year")
                 {
                     r.Date = r.Date.AddYears(time);
                 }
                 else
                 {
-                    //error
+                    writer.ShowError(0, "set reminder to next date failed");
                 }
             }
         }
@@ -202,8 +222,5 @@ namespace Reminders
                 throw new InvalidOperationException("No Reminder with ID " + id + " found.");
             }
         }
-
-        public int UpcomingDays { get => upcomingDays; set => upcomingDays = value; }
-        public List<Reminder> Reminders { get => reminders; }
     }
 }

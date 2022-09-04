@@ -9,13 +9,14 @@ using SimultaneousConsoleIO;
 
 namespace Reminders
 {
-    public class Program
+    public static class Program
     {
         //maybe let user change timeout value in config?
         private static IOutputWriter outputWriter;
         private static OutputTextWriter writer; //call this from remindermanager or commandexecuter (if even needed at all)
         private static ReminderManager reminderMgr;
         private static CommandExecutor cmdExec;
+        private static SimulConsoleIO simio;
         /*private static Queue<string> outputTextQueue = new Queue<string>();
         private static StringBuilder cmdInput = new StringBuilder();*/
 
@@ -25,33 +26,28 @@ namespace Reminders
 
             Init();
 
+            writer.ShowWelcome(); //todo 2 methods first only void, add args of method to config (or data?)
+            writer.ShowWelcomeReminders(reminderMgr.UpcomingDays, reminderMgr.GetRemindersDueInTimespan(DateTime.Today, DateTime.Today.AddDays(reminderMgr.UpcomingDays)));
+            
             while (true) // main program loop
-            {
-                string s = Console.ReadLine();
-                Console.WriteLine(s);
-
-                //cmdExec.Execute(Console.ReadLine()); TODO
-            }
+                cmdExec.Execute(simio.ReadLine(">>>"));
         }
 
         private static void Init()
         {
             Console.OutputEncoding = Encoding.Unicode;
 
-            outputWriter = new OutputWriter(); //problem of circular dependency?
-            SimulConsoleIO simio = new SimulConsoleIO(outputWriter);
+            outputWriter = new OutputWriter();
+            simio = new SimulConsoleIO(outputWriter);
             writer = new OutputTextWriter(simio);
             reminderMgr = new ReminderManager(writer);
             simio.TextProvider = new TextProvider(reminderMgr);
             cmdExec = new CommandExecutor(writer, reminderMgr);
 
-            DisableQuickEdit dqe = new DisableQuickEdit();
+            DisableQuickEdit dqe = new DisableQuickEdit(); //TODO still needed???
             if (!dqe.Disable())
-                writer.ShowError(0, ""); //TODO give user info that console wont get updated if he clicks anywhere in it
-
-            writer.ShowWelcome(); //todo 2 methods first only void, add args of method to config (or data?)
-            writer.ShowWelcomeReminders(reminderMgr.UpcomingDays, "");
-
+                writer.ShowError(0, ""); //give user info that console wont get updated if he clicks anywhere in it
+            
             /* while (true)
              {
                  if (DateTime.Now == new DateTime(DateTime.Now.Year, 5, 25))
@@ -68,11 +64,7 @@ namespace Reminders
                     Thread.Sleep(5000);
                 }
             });*/
-
-            while (true)
-                cmdExec.Execute(simio.ReadLine("")); //use keyavailable there so readline doesnt block and output doesnt need extra thread
         }
-
 
         private static void Test() //method only temporary
         {
