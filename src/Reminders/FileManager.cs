@@ -18,7 +18,7 @@ namespace Reminders
 
         private OutputTextWriter writer;
 
-        private string appPath = AppDomain.CurrentDomain.BaseDirectory;
+        private readonly string appPath = AppDomain.CurrentDomain.BaseDirectory;
         private string dataPath;
         private string dataFilename = "data.rmdr";
         private string fileRaw; //first used for loading config, then only for data file (.rmdr) REPLACE WITH LOCAL VARIABLE???
@@ -35,12 +35,14 @@ namespace Reminders
 
         private void Init()
         {
+            dataPath = appPath;
+            
             if (! LoadConfig())
-                writer.ShowError(2, "");
+                writer.ShowError(0, "loadconfig failed");
             //give option to reset config
 
             if (! LoadData())
-                writer.ShowError(3, "");
+                writer.ShowError(0, "loaddata failed");
         }
 
         // loads config file and applies the settings
@@ -48,9 +50,9 @@ namespace Reminders
         {
             // structure of config file: parameter=value;[newline]... (= and ; characters not used in names or values)
 
-            if (! LoadFile(appPath, ConfigFile))
+            if (! LoadFile(dataPath, ConfigFile))
             {
-                //send error to textwriter
+                writer.ShowError(0, "loadfile failed");
                 
                 return false;
             }
@@ -60,7 +62,7 @@ namespace Reminders
 
             if (lines.Length != NumConfigArgs + 1) //+1 for the extra line which is removed next
             {
-                //send error to textwriter
+                writer.ShowError(0, "config file incomplete");
 
                 return false;
             }
@@ -78,10 +80,10 @@ namespace Reminders
 
                 ApplyConfig(values);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 //send error to textwriter: config file is corrupted, wrong syntax used
-                Console.WriteLine(e.StackTrace);
+                writer.ShowError(0, ex.Message);
                 return false;
             }
 
@@ -92,7 +94,7 @@ namespace Reminders
         {
             // param: path; allowed values: "default" or any file path
             if (values[0] == "default") //path of application
-                dataPath = AppDomain.CurrentDomain.BaseDirectory;
+                dataPath = appPath;
             else
                 dataPath = values[0];
 
@@ -116,7 +118,7 @@ namespace Reminders
                     File.Delete(shortcutPath);
                 else
                 {
-                    //send note to textwriter
+                    writer.ShowError(0, "delete autostart shortcut failed");
                     //no return false needed because situation is weird but no negative impact on program
                 }
             }
@@ -138,22 +140,20 @@ namespace Reminders
             return SaveFile(appPath, ConfigFile, ConfigText);
         }
 
-        public bool SaveConfig()
+        public void SaveConfig()
         {
-            string configText = "path=" + appPath + ";\n" +
+            string configText = "path=" + dataPath + ";\n" +
                                 "autostart=" + autostart + ";\n" +
                                 "upcomingreminderstime=" + upcomingDays + ";";
 
-            SaveFile(appPath, ConfigFile, configText);
-
-            return true;
+            SaveFile(dataPath, ConfigFile, configText);
         }
 
         public bool LoadData()
         {
             // structure of data file: YYYYMMDDhhmm;[-1..n <- repeat];[content];[newline]...
 
-            if (! LoadFile(appPath, dataFilename))
+            if (! LoadFile(dataPath, dataFilename))
             {
                 writer.ShowError(0, "loadfile failed");
                 return false;
@@ -207,9 +207,9 @@ namespace Reminders
 
                 reminders = rmdrs;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                writer.ShowError(0, "creation of reminders failed");
+                writer.ShowError(0, ex.Message/*"creation of reminders failed"*/);
                 return false;
             }
 
@@ -259,10 +259,10 @@ namespace Reminders
             {
                 fileRaw = File.ReadAllText(Path.Combine(path, name));
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 fileRaw = "ERROR";
-                writer.ShowError(0, "loadfile failed");
+                writer.ShowError(0, ex.Message);
 
                 return false;
             }
@@ -277,9 +277,9 @@ namespace Reminders
             {
                 File.WriteAllText(Path.Combine(path, name), content, Encoding.Unicode);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                writer.ShowError(0, "savefile failed");
+                writer.ShowError(0, ex.Message);
 
                 return false;
             }
@@ -307,7 +307,7 @@ namespace Reminders
 
         public string Filename
         {
-            get { return dataFilename; }
+            get => dataFilename;
             set // very late feature, absolutely not needed at beginning
             {
                 // users can enter filename without extension
@@ -318,10 +318,18 @@ namespace Reminders
             }
         }
 
-        /*public string DataPath
+        public string DataPath
         {
-            get { return dataPath; }
-        }*/
+            get => dataPath;
+            set
+            {
+                if (value != dataPath)
+                {
+                    dataPath = value;
+                    SaveData();
+                }
+            }
+        }
 
         public Reminder[] Reminders
         {
