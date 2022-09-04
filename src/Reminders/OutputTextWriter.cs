@@ -34,7 +34,8 @@ namespace Reminders
         public void ShowWelcomeReminders(int days, List<Reminder> reminders)
         {
             simio.WriteLine("Here are all reminders for the next " + ConverterFormatter.FormatTime(days) + ":");
-            simio.WriteLine(ConverterFormatter.FormatRemindersFull(reminders, ReminderStartText));
+            if (reminders.Count > 0)
+                simio.WriteLine(ConverterFormatter.FormatRemindersFull(reminders, ReminderStartText));
         }
 
         public void CreateReminder(Reminder r)

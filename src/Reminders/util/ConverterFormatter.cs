@@ -133,7 +133,7 @@ namespace Reminders.util
             }*/
             string s = reminderStartText + rmdrs[0].ToString();
 
-            for (var i = 1; i < rmdrs.Count; i++)
+            for (int i = 1; i < rmdrs.Count; i++)
             {
                 s += Environment.NewLine + reminderStartText + rmdrs[i].ToString();
             }
