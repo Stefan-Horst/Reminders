@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Reminders.util
@@ -120,6 +121,24 @@ namespace Reminders.util
             int minute = int.Parse(dateString.Substring(10, 2));
 
             return new DateTime(year, month, day, hour, minute, 0);
+        }
+        
+        public static string FormatRemindersFull(List<Reminder> rmdrs, string reminderStartText)
+        {
+            /*string s = "";
+
+            foreach (Reminder r in rmdrs)
+            {
+                s += "\t> " + r.ToString() + Environment.NewLine;
+            }*/
+            string s = reminderStartText + rmdrs[0].ToString();
+
+            for (var i = 1; i < rmdrs.Count; i++)
+            {
+                s += Environment.NewLine + reminderStartText + rmdrs[i].ToString();
+            }
+
+            return s;
         }
     }
 }
