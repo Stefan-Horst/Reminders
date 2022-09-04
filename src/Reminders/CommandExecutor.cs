@@ -80,7 +80,7 @@ namespace Reminders
                 case "settings":
                 case "config":
                 case "co":
-                    CmdSettings();
+                    CmdConfig();
                     break;
                 
                 case "exit":
@@ -525,10 +525,61 @@ namespace Reminders
             }
         }
 
-        //command structure: config[/co/settings]
-        private void CmdSettings()
+        //command: config param value / config reset
+        //command structure: config[/co/settings] {parameter} {value}  /  config[/co/settings] reset
+        private void CmdConfig()
         {
-
+            try
+            {
+                if (tokens.Length == 1)
+                {
+                    writer.ShowConfig(reminderMgr.FileMgr.DataPath, reminderMgr.FileMgr.Autostart, reminderMgr.FileMgr.UpcomingDays);
+                }
+                else if (tokens.Length == 2 && tokens[1] == "reset")
+                {
+                    reminderMgr.FileMgr.RestoreConfigToDefault();
+                }
+                else if (tokens.Length == 3)
+                {
+                    switch (tokens[1])
+                    {
+                        case "path":
+                            reminderMgr.FileMgr.DataPath = tokens[2];
+                            writer.EditConfig("path = " + tokens[2]);
+                            break;
+                        case "autostart":
+                            if (tokens[2] == "true" || tokens[2] == "yes" || tokens[2] == "1")
+                                reminderMgr.FileMgr.Autostart = true;
+                            else if (tokens[2] == "false" || tokens[2] == "no" || tokens[2] == "0")
+                                reminderMgr.FileMgr.Autostart = false;
+                            else
+                            {
+                                writer.ShowError(0, "wrong args");
+                                return;
+                            }
+                            writer.EditConfig("autostart = " + reminderMgr.FileMgr.Autostart);
+                            break;
+                        case "upcomingreminderstime":
+                        case "upcomingRemindersTime":
+                        case "time":
+                            reminderMgr.FileMgr.UpcomingDays = int.Parse(tokens[2]);
+                            writer.EditConfig("upcomingRemindersTime = " + int.Parse(tokens[2]));
+                            break;
+                        default:
+                            writer.ShowError(0, "wrong args");
+                            return;
+                    }
+                    reminderMgr.FileMgr.SaveConfig();
+                }
+                else
+                {
+                    writer.ShowError(0, "wrong args");
+                }
+            }
+            catch (Exception ex)
+            {
+                writer.ShowError(0, ex.Message);
+            }
         }
 
         //command: exit
