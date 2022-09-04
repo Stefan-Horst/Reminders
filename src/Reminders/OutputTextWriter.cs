@@ -16,7 +16,7 @@ namespace Reminders
             this.simio = simio;
         }
         
-        public void ShowWelcome() //todo split into two first one only logo
+        public void ShowWelcome()
         {
             // ASCII text from https://patorjk.com/software/taag/#p=display&h=3&v=0&f=Standard
             simio.WriteLine("=======================================================    " + Environment.NewLine +
@@ -28,30 +28,82 @@ namespace Reminders
                               "=                                                     =    " + Environment.NewLine +
                               "=======================================================    " + Environment.NewLine);
 
-            simio.WriteLine("Welcome to Reminders! Today's date is: " + DateTime.Today.ToShortDateString());
+            simio.WriteLine("Welcome to your Reminders! Today's date is: " + DateTime.Today.ToShortDateString());
         }
 
-        public void ShowWelcomeReminders(int days, string reminders)
+        public void ShowWelcomeReminders(int days, List<Reminder> reminders)
         {
             simio.WriteLine("Here are all reminders for the next " + ConverterFormatter.FormatTime(days) + ":");
-            simio.WriteLine(GetUpcomingRemindersRaw(reminders));
+            simio.WriteLine(ConverterFormatter.FormatRemindersFull(reminders, ReminderStartText));
         }
 
-        public void CreateReminder()
+        public void CreateReminder(Reminder r)
         {
-            simio.WriteLine("");
-
+            simio.WriteLine("Reminder created:");
+            PrintReminder(r);
         }
 
         public void DeleteReminder(Reminder r)
         {
-            simio.WriteLine("");
-
+            simio.WriteLine("Reminder deleted:");
+            PrintReminder(r);
         }
 
         public void ShowReminder(Reminder r)
         {
-            simio.WriteLine(r.ToString());
+            simio.WriteLine("Details of reminder:");
+            PrintReminder(r);
+        }
+        
+        public void UpdateReminder(Reminder rOld, Reminder rNew)
+        {
+            simio.WriteLine("Reminder updated, old details:");
+            PrintReminder(rOld);
+            simio.WriteLine("New details:");
+            PrintReminder(rNew);
+        }
+        
+        public string EditReminder(string content)
+        {
+            simio.WriteLine("Update the content of the reminder below:");
+            return simio.ReadLine("", content);
+        }
+        
+        public void ShowHelp()
+        {
+            simio.WriteLine("Use the console to create, modify and delete reminders.");
+            simio.WriteLine("Type \"commands\" for a detailed list of commands you can use");
+        }
+
+        public void ShowCommands()
+        {
+            simio.WriteLine("A list of all commands including abbreviations and with parameters:" + Environment.NewLine +
+                            "- read[/r] {id}" + Environment.NewLine +
+                            "- create[/c] {dd(.)mm(.)(yy)yy} ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) {text}" + Environment.NewLine +
+                            "- delete[/del/d] {id}" + Environment.NewLine +
+                            "- update[/u] {id} ({dd(.)mm(.)(yy)yy}) ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) ({text})" + Environment.NewLine +
+                            "- edit[/e] {id}" + Environment.NewLine +
+                            "- search[/se] {term} (\"{term2..n}\")" + Environment.NewLine +
+                            "- show[/s] ([un]read[/[u/]r]) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]/yesterday[/ye](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]" + Environment.NewLine +
+                            "\tshow[/s] ([un]read[/[u/]r]) (s{dd(.)mm(.)(yy)yy)}) (e{dd(.)mm(.)(yy)yy)})" + Environment.NewLine +
+                            "- config[/co/settings] {parameter} {value}" + Environment.NewLine +
+                            "\tconfig[/co/settings] reset" + Environment.NewLine +
+                            "- exit");
+        }
+        
+        public void ShowConfig(string path, bool autostart, int time)
+        {
+            simio.WriteLine("Configurable parameters and their current values:" + Environment.NewLine +
+                            "\tpath = " + path + Environment.NewLine +
+                            "\tautostart = " + autostart + Environment.NewLine +
+                            "\tupcomingRemindersTime = " + time + " (in days)" + Environment.NewLine +
+                            "(You can also change these values in the config.txt file, but a restart of this program will be needed for them to take effect)");
+        }
+
+        public void EditConfig(string value)
+        {
+            simio.WriteLine("Config updated:");
+            simio.WriteLine("\t" + value);
         }
 
         // only show upcoming reminders like in the welcome message
@@ -67,9 +119,9 @@ namespace Reminders
 
             if (rmdrs.Count == 1)
             {
-                s = "========== Due Reminder: ==========";
+                s = "========== Due Reminder: ==========" + Environment.NewLine;
 
-                s += ConverterFormatter.FormatRemindersFull(rmdrs, ReminderStartText);
+                s += ConverterFormatter.FormatRemindersFull(rmdrs, ReminderStartText) + Environment.NewLine;
                 
                 s += "===================================";
             }
@@ -77,7 +129,7 @@ namespace Reminders
             {
                 s = "========== Due Reminders: ==========";
 
-                s += ConverterFormatter.FormatRemindersFull(rmdrs, ReminderStartText);
+                s += ConverterFormatter.FormatRemindersFull(rmdrs, ReminderStartText) + Environment.NewLine;
                 
                 s += "====================================";
             }
@@ -95,21 +147,10 @@ namespace Reminders
                 if (s.Length > Console.BufferWidth && ! (s.Length - r.Content.Length > Console.BufferWidth))
                     s = s.Remove(Console.BufferWidth); // trim content so that each reminder is not longer than one line in console
 
-                simio.WriteLine(s);
+                simio.WriteLine(ReminderStartText + s);
             }
         }
-
-        public void UpdateReminder()
-        {
-            simio.WriteLine("");
-
-        }
         
-        public string EditReminder(string content)
-        {
-            return simio.ReadLine("", content);
-        }
-
         public void ShowLog(int type) //use outputwriter here
         {
             switch (type)
@@ -141,21 +182,10 @@ namespace Reminders
                     return; //add error message but only for development mode not the user in general
             }
         }
-
-        public void ShowHelp()
+        
+        private void PrintReminder(Reminder r)
         {
-            simio.WriteLine("todo help");
-        }
-
-        public void ShowCommands()
-        {
-            simio.WriteLine("todo command list");
-        }
-
-        private string GetUpcomingRemindersRaw(string reminders) //reminder as string or array, should already be correct amount for time, this method is only for formatting
-        {
-
-            return "";
+            simio.WriteLine(ReminderStartText + r.ToString());
         }
     }
 }

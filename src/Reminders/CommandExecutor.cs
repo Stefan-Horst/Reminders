@@ -37,6 +37,7 @@ namespace Reminders
 
                 case "commands":
                 case "cmds":
+                case "cmd":
                     writer.ShowCommands();
                     break;
 
@@ -197,7 +198,9 @@ namespace Reminders
                     return;
                 }*/
                 //if (IsDateValid(date, out string date1) && IsTimeValid(time, out string time1) && IsTimespanValid(repeat, out _))
-                reminderMgr.CreateReminder(date + time, repeat, sb.ToString());
+                int id = reminderMgr.CreateReminder(date + time, repeat, sb.ToString());
+                
+                writer.CreateReminder(reminderMgr.ReadReminder(id));
             }
             catch (Exception ex)
             {
@@ -238,6 +241,7 @@ namespace Reminders
             try
             {
                 Reminder r = reminderMgr.ReadReminder(int.Parse(tokens[1]));
+                Reminder rClone = new Reminder(r.DateString, r.Repeat, r.Read, r.Content);
 
                 for (int i = 2; i < tokens.Length; i++)
                 {
@@ -269,8 +273,10 @@ namespace Reminders
                         }
                         r.Content = sb.ToString();
 
+                        writer.UpdateReminder(rClone, r);
                         return;
                     }
+                    writer.UpdateReminder(rClone, r);
                 }
             }
             catch (Exception ex)
@@ -285,17 +291,20 @@ namespace Reminders
         {
             try
             {
-               if (tokens.Length != 2)
-               {
+                if (tokens.Length != 2)
+                {
                    writer.ShowError(0, "wrong args");
                    return;
-               }
-               
-               Reminder r = reminderMgr.ReadReminder(int.Parse(tokens[1]));
-               r.Content = writer.EditReminder(r.Content);;
+                }
+
+                Reminder r = reminderMgr.ReadReminder(int.Parse(tokens[1]));
+                Reminder rClone = new Reminder(r.DateString, r.Repeat, r.Read, r.Content);
+                r.Content = writer.EditReminder(r.Content);
+
+                writer.UpdateReminder(rClone , r);
             }
             catch (Exception ex)
-            {
+            { 
                 writer.ShowError(0, ex.Message);
             }
         }
@@ -361,7 +370,7 @@ namespace Reminders
         }
 
         //command: show unread startdate enddate / date / last timespan
-        //command structure: show[/s] ([un]read[/[u/]r]) (s{dd(.)mm(.)(yy)yy)}) (e{dd(.)mm(.)(yy)yy)})  /  show[/s] ([un]read) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]/yesterday[/ye](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]
+        //command structure: show[/s] ([un]read[/[u/]r]) (s{dd(.)mm(.)(yy)yy)}) (e{dd(.)mm(.)(yy)yy)})  /  show[/s] ([un]read[/[u/]r]) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]/yesterday[/ye](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]
         private void CmdShow()
         {
             // show full text or only preview in list when multiple reminders are shown?
