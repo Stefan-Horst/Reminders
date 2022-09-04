@@ -99,6 +99,16 @@ namespace Reminders
             ReadReminder(id).Read = read;
         }
 
+        public string GetDueRemindersOutput()
+        {
+            string s;
+            List<Reminder> rmdrs = GetDueReminders(DateTime.Now);
+
+            s = rmdrs.Count > 0 ? writer.DueReminders(rmdrs) : "";
+            
+            return s;
+        }
+
         public List<Reminder> GetRemindersDueOnDate(DateTime date)
         {
             return GetRemindersDueInTimespan(date, date);

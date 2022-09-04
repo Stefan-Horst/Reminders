@@ -8,6 +8,8 @@ namespace Reminders
     public class OutputTextWriter //call class "outputtext"?
     {
         private SimulConsoleIO simio;
+
+        private const string ReminderStartText = "\t> ";
         
         public OutputTextWriter (SimulConsoleIO simio)
         {
@@ -53,12 +55,37 @@ namespace Reminders
         }
 
         // only show upcoming reminders like in the welcome message
-        public void ShowUpcomingReminders(int days, string reminders)
+        /*public void ShowUpcomingReminders(int days, string reminders)
         {
             simio.WriteLine("Reminders for the next " + converter.FormatTime(days) + ":");
             simio.WriteLine(GetUpcomingRemindersRaw(reminders));
-        }
+        }*/
 
+        public string DueReminders(List<Reminder> rmdrs) // cant print here because need to be printed from outputwriter
+        {
+            string s;
+
+            if (rmdrs.Count == 1)
+            {
+                s = "========== Due Reminder: ==========";
+
+                s += ConverterFormatter.FormatRemindersFull(rmdrs, ReminderStartText);
+                
+                s += "===================================";
+            }
+            else
+            {
+                s = "========== Due Reminders: ==========";
+
+                s += ConverterFormatter.FormatRemindersFull(rmdrs, ReminderStartText);
+                
+                s += "====================================";
+            }
+            
+            return s;
+        }
+        
+        // lists multiple reminders in a shortened way so that none breaks line due to its length
         public void ListReminders(List<Reminder> reminders)
         {
             foreach (Reminder r in reminders)
