@@ -12,6 +12,7 @@ namespace Reminders
 
         private int upcomingDays;
         private List<Reminder> reminders;
+        private List<int> shownReminders = new List<int>(); // reminders (ids) in this list will not be shown again as due during runtime
 
         private int idIterator; //no need for static as ids are assigned during (each) runtime
 
@@ -103,6 +104,9 @@ namespace Reminders
         {
             string s;
             List<Reminder> rmdrs = GetDueReminders(DateTime.Now);
+            rmdrs.RemoveAll(r => shownReminders.Contains(r.Id)); // remove reminders that have already been shown
+            
+            shownReminders.AddRange(rmdrs.Select(r => r.Id).ToList());
 
             s = rmdrs.Count > 0 ? writer.DueReminders(rmdrs) : "";
             
