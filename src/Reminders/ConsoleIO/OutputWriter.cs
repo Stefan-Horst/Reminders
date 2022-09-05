@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SimultaneousConsoleIO;
 
 namespace Reminders.ConsoleIO
 {
-    class OutputWriter : IOutputWriter
+    public class OutputWriter : IOutputWriter
     {
         private Queue<string> outputTextQueue = new Queue<string>();
         private string startText; // text which will be at beginning of all output
@@ -24,14 +23,9 @@ namespace Reminders.ConsoleIO
         public string GetText()
         {
             string s = "";
-
-            if (outputTextQueue.Count > 0)
-            {
-                while (outputTextQueue.Count > 1)
-                    s += outputTextQueue.Dequeue() + Environment.NewLine;
-
+            
+            while (outputTextQueue.Count > 0)
                 s += outputTextQueue.Dequeue();
-            }
 
             return s;
         }

@@ -3,7 +3,7 @@ using SimultaneousConsoleIO;
 
 namespace Reminders.ConsoleIO
 {
-    class TextProvider : ITextProvider
+    public class TextProvider : ITextProvider
     {
         private IOutputWriter outputWriter;
         private ReminderManager reminderManager;
@@ -23,7 +23,7 @@ namespace Reminders.ConsoleIO
             //reminderManager.GetDueReminders(DateTime.Now).ForEach(i => outputWriter.AddText(i.ToString()));
             string output = reminderManager.GetDueRemindersOutput();
             if (output != "")
-                outputWriter.AddText(output);
+                outputWriter.AddText(output + Environment.NewLine);
         }
     }
 }
