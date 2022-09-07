@@ -299,6 +299,7 @@ namespace Reminders
 
                 Reminder r = reminderMgr.ReadReminder(int.Parse(tokens[1]));
                 Reminder rClone = new Reminder(r.DateString, r.Repeat, r.Read, r.Content);
+                rClone.Id = r.Id;
                 r.Content = writer.EditReminder(r.Content);
 
                 writer.UpdateReminder(rClone , r);
@@ -327,7 +328,7 @@ namespace Reminders
                         { 
                             if (tokens[i].EndsWith('"'))
                             {
-                                terms.Add(tokens[i]);
+                                terms.Add(tokens[i].Remove(tokens[i].Length - 1)[1..]); // remove " from start end end of term
                                 continue;
                             }
                             if (string.Join("", tokens[i..]).Contains('"')) // make sure there is a second " in a later token
@@ -337,7 +338,8 @@ namespace Reminders
                                     sb.Append(tokens[i]);
                                     i++;
                                 }
-                                terms.Add(sb.ToString());
+                                string s = sb.ToString();
+                                terms.Add(s.Remove(s.Length - 1)[1..]); // remove " from start end end of term
                             }
                         }
                         else

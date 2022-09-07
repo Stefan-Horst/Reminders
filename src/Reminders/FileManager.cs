@@ -202,7 +202,7 @@ namespace Reminders
                 {
                     Reminder r = new Reminder(values[i], values[i + 1], bool.Parse(values[i + 2]), values[i + 3]);
 
-                    rmdrs[i / 3] = r;
+                    rmdrs[i / NumRmdrParams] = r;
                 }
 
                 reminders = rmdrs;
