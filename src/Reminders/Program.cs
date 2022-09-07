@@ -30,7 +30,7 @@ namespace Reminders
             writer.ShowWelcomeReminders(reminderMgr.UpcomingDays, reminderMgr.GetRemindersDueInTimespan(DateTime.Today, DateTime.Today.AddDays(reminderMgr.UpcomingDays)));
             
             while (true) // main program loop
-                cmdExec.Execute(simio.ReadLine(">>>"));
+                cmdExec.Execute(simio.ReadLine(">>> "));
         }
 
         private static void Init()

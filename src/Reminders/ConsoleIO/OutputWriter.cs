@@ -10,7 +10,7 @@ namespace Reminders.ConsoleIO
 
         public string StartText { get => startText; set => startText = value; }
 
-        public OutputWriter(string startText = "")
+        public OutputWriter(string startText = " ")
         {
             this.startText = startText;
         }

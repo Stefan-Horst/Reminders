@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Reminders.util;
 using SimultaneousConsoleIO;
 
@@ -10,32 +11,47 @@ namespace Reminders
         private SimulConsoleIO simio;
 
         private const string ReminderStartText = "\t> ";
+        private int reminderStartTotalLength;
         
         public OutputTextWriter (SimulConsoleIO simio)
         {
             this.simio = simio;
+            
+            const int tabLength = 7;
+            
+            reminderStartTotalLength = ReminderStartText.Length;
+            
+            if (ReminderStartText.Contains("\t"))
+                reminderStartTotalLength += tabLength;
         }
         
         public void ShowWelcome()
         {
             // ASCII text from https://patorjk.com/software/taag/#p=display&h=3&v=0&f=Standard
-            simio.WriteLine("=======================================================    " + Environment.NewLine +
-                              "=   ____                _           _                 =    " + Environment.NewLine +
-                              "=  |  _ \\ ___ _ __ ___ (_)_ __   __| | ___ _ __ ___   =   " + Environment.NewLine +
-                              "=  | |_) / _ | '_ ` _ \\| | '_ \\ / _` |/ _ | '__/ __|  =  " + Environment.NewLine +
-                              "=  |  _ |  __| | | | | | | | | | (_| |  __| |  \\__ \\  =  " + Environment.NewLine +
-                              "=  |_| \\_\\___|_| |_| |_|_|_| |_|\\__,_|\\___|_|  |___/  =" + Environment.NewLine +
-                              "=                                                     =    " + Environment.NewLine +
-                              "=======================================================    " + Environment.NewLine);
+            simio.WriteLine(Environment.NewLine +
+                              " =======================================================    " + Environment.NewLine +
+                              " =   ____                _           _                 =    " + Environment.NewLine +
+                              " =  |  _ \\ ___ _ __ ___ (_)_ __   __| | ___ _ __ ___   =   " + Environment.NewLine +
+                              " =  | |_) / _ | '_ ` _ \\| | '_ \\ / _` |/ _ | '__/ __|  =  " + Environment.NewLine +
+                              " =  |  _ |  __| | | | | | | | | | (_| |  __| |  \\__ \\  =  " + Environment.NewLine +
+                              " =  |_| \\_\\___|_| |_| |_|_|_| |_|\\__,_|\\___|_|  |___/  =" + Environment.NewLine +
+                              " =                                                     =    " + Environment.NewLine +
+                              " =======================================================    " + Environment.NewLine);
 
             simio.WriteLine("Welcome to your Reminders! Today's date is: " + DateTime.Today.ToShortDateString());
         }
 
         public void ShowWelcomeReminders(int days, List<Reminder> reminders)
         {
-            simio.WriteLine("Here are all reminders for the next " + ConverterFormatter.FormatTime(days) + ":");
             if (reminders.Count > 0)
-                simio.WriteLine(ConverterFormatter.FormatRemindersFull(reminders, ReminderStartText));
+            {
+                simio.WriteLine("Here are all reminders for the next " + ConverterFormatter.FormatTime(days) + ":");
+                simio.WriteLine(ConverterFormatter.FormatRemindersFull(reminders, ReminderStartText) + Environment.NewLine);
+            }
+            else
+            {
+                simio.WriteLine("There are no reminders for the next " + ConverterFormatter.FormatTime(days) + "." + Environment.NewLine);
+            }
         }
 
         public void CreateReminder(Reminder r)
@@ -79,17 +95,17 @@ namespace Reminders
         public void ShowCommands()
         {
             simio.WriteLine("A list of all commands including abbreviations and with parameters:" + Environment.NewLine +
-                            "- read[/r] {id}" + Environment.NewLine +
-                            "- create[/c] {dd(.)mm(.)(yy)yy} ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) {text}" + Environment.NewLine +
-                            "- delete[/del/d] {id}" + Environment.NewLine +
-                            "- update[/u] {id} ({dd(.)mm(.)(yy)yy}) ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) ({text})" + Environment.NewLine +
-                            "- edit[/e] {id}" + Environment.NewLine +
-                            "- search[/se] {term} (\"{term2..n}\")" + Environment.NewLine +
-                            "- show[/s] ([un]read[/[u/]r]) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]/yesterday[/ye](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]" + Environment.NewLine +
+                            " - read[/r] {id}" + Environment.NewLine +
+                            " - create[/c] {dd(.)mm(.)(yy)yy} ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) {text}" + Environment.NewLine +
+                            " - delete[/del/d] {id}" + Environment.NewLine +
+                            " - update[/u] {id} ({dd(.)mm(.)(yy)yy}) ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) ({text})" + Environment.NewLine +
+                            " - edit[/e] {id}" + Environment.NewLine +
+                            " - search[/se] {term} (\"{term2..n}\")" + Environment.NewLine +
+                            " - show[/s] ([un]read[/[u/]r]) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]/yesterday[/ye](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]" + Environment.NewLine +
                             "\tshow[/s] ([un]read[/[u/]r]) (s{dd(.)mm(.)(yy)yy)}) (e{dd(.)mm(.)(yy)yy)})" + Environment.NewLine +
-                            "- config[/co/settings] {parameter} {value}" + Environment.NewLine +
+                            " - config[/co/settings] {parameter} {value}" + Environment.NewLine +
                             "\tconfig[/co/settings] reset" + Environment.NewLine +
-                            "- exit");
+                            " - exit");
         }
         
         public void ShowConfig(string path, bool autostart, int time)
@@ -98,7 +114,7 @@ namespace Reminders
                             "\tpath = " + path + Environment.NewLine +
                             "\tautostart = " + autostart + Environment.NewLine +
                             "\tupcomingRemindersTime = " + time + " (in days)" + Environment.NewLine +
-                            "(You can also change these values in the config.txt file, but a restart of this program will be needed for them to take effect)");
+                            " (You can also change these values in the config.txt file, but a restart of this program will be needed for them to take effect)");
         }
 
         public void EditConfig(string value)
@@ -120,38 +136,24 @@ namespace Reminders
 
             if (rmdrs.Count == 1)
             {
-                s = "========== Due Reminder: ==========" + Environment.NewLine;
+                s = Environment.NewLine + " ========================= Due Reminder: =========================" + Environment.NewLine;
 
                 s += ConverterFormatter.FormatRemindersFull(rmdrs, ReminderStartText) + Environment.NewLine;
                 
-                s += "===================================";
+                s += " =================================================================" + Environment.NewLine;
             }
             else
             {
-                s = "========== Due Reminders: ==========";
+                s = Environment.NewLine + " ========================= Due Reminders: =========================";
 
                 s += ConverterFormatter.FormatRemindersFull(rmdrs, ReminderStartText) + Environment.NewLine;
                 
-                s += "====================================";
+                s += " ==================================================================" + Environment.NewLine;
             }
             
             return s;
         }
-        
-        // lists multiple reminders in a shortened way so that none breaks line due to its length
-        public void ListReminders(List<Reminder> reminders)
-        {
-            foreach (Reminder r in reminders)
-            {
-                string s = r.ToString();
 
-                if (s.Length > Console.BufferWidth && ! (s.Length - r.Content.Length > Console.BufferWidth))
-                    s = s.Remove(Console.BufferWidth); // trim content so that each reminder is not longer than one line in console
-
-                simio.WriteLine(ReminderStartText + s);
-            }
-        }
-        
         public void ShowLog(int type) //use outputwriter here
         {
             switch (type)
@@ -184,9 +186,70 @@ namespace Reminders
             }
         }
         
+        // lists multiple reminders in a shortened way so that none breaks line due to its length
+        public void ListReminders(List<Reminder> reminders)
+        {
+            if (reminders.Count > 0)
+            {
+                int maxRepeatLength = reminders.Max(r => r.Repeat.Length);
+                int maxIdLength = reminders.Max(r => r.Id).ToString().Length;
+
+                foreach (Reminder r in reminders)
+                {
+                    // equal formatting for every reminder
+                    string s = "Id: " + r.Id + new string(' ', maxIdLength - r.Id.ToString().Length) + ", " + r.Date.ToShortDateString() + " " + r.Date.ToShortTimeString() + ", Repeat: " + r.Repeat + "," + new string(' ', maxRepeatLength - r.Repeat.Length) + " Content: " + r.Content;
+
+                    if (reminderStartTotalLength + s.Length > Console.BufferWidth && !(reminderStartTotalLength + s.Length - r.Content.Length > Console.BufferWidth))
+                    {
+                        s = s.Remove(Console.BufferWidth - reminderStartTotalLength - 4); // trim content so that each reminder is not longer than one line in console
+
+                        //if (ReminderStartText.Contains("\t"))
+                        //    s = s.Remove(s.Length - TabLength);
+
+                        s += "...";
+                    }
+                    simio.WriteLine(ReminderStartText + s);
+                }
+            }
+        }
+        
         private void PrintReminder(Reminder r)
         {
-            simio.WriteLine(ReminderStartText + r.ToString());
+            string s = "Id: " + r.Id + ", Date: " + r.Date.ToShortDateString() + " " + r.Date.ToShortTimeString() + ", Repeat: " + r.Repeat;
+            
+            /*if (ReminderStartText.Length + s.Length + r.Content.Length > Console.BufferWidth && !(ReminderStartText.Length + s.Length - r.Content.Length > Console.BufferWidth))
+            {
+                s = s.Remove(Console.BufferWidth - ReminderStartText.Length - 4); // trim content so that each reminder is not longer than one line in console
+
+                if (ReminderStartText.Contains("\t"))
+                    s = s.Remove(s.Length - TabLength);
+
+                s += "...";
+            }
+            else
+            {
+                s += r.Content;
+            }*/
+            simio.WriteLine(ReminderStartText + s);
+
+            s = new string(' ', reminderStartTotalLength - 1) + "Content: " + r.Content;
+            
+            if (reminderStartTotalLength + r.Content.Length > Console.BufferWidth) // split output over multiple lines with indentation in each line
+            {
+                while (s.Length / Console.BufferWidth > 0)
+                {
+                    simio.WriteLine(s.Remove(Console.BufferWidth - 2));
+
+                    s = new string(' ', reminderStartTotalLength - 1) + s[(Console.BufferWidth - 2)..];
+                }
+                
+                if (s.Length > reminderStartTotalLength)
+                    simio.WriteLine(s);
+            }
+            else
+            {
+                simio.WriteLine(s);
+            }
         }
     }
 }
