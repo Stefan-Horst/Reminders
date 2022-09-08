@@ -1,17 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Reminders.util;
 using SimultaneousConsoleIO;
 
 namespace Reminders
 {
+    public enum LogType
+    {
+        Error,
+        ErrorCritical, // error which breaks program
+        ErrorEx, // error caused by exception
+        Problem,
+        Info
+    }
+    
     public class OutputTextWriter //call class "outputtext"?
     {
         private SimulConsoleIO simio;
 
         private const string ReminderStartText = "\t> ";
         private int reminderStartTotalLength;
+        private bool devmode = false;
+
+        public bool Devmode { get => devmode; set => devmode = value; }
         
         public OutputTextWriter (SimulConsoleIO simio)
         {
@@ -94,7 +108,7 @@ namespace Reminders
 
         public void ShowCommands()
         {
-            simio.WriteLine("A list of all commands including abbreviations and with parameters:" + Environment.NewLine +
+            simio.WriteLine(" A list of all commands including abbreviations and with parameters:" + Environment.NewLine +
                             " - read[/r] {id}" + Environment.NewLine +
                             " - create[/c] {dd(.)mm(.)(yy)yy} ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) {text}" + Environment.NewLine +
                             " - delete[/del/d] {id}" + Environment.NewLine +
@@ -110,7 +124,7 @@ namespace Reminders
         
         public void ShowConfig(string path, bool autostart, int time)
         {
-            simio.WriteLine("Configurable parameters and their current values:" + Environment.NewLine +
+            simio.WriteLine(" Configurable parameters and their current values:" + Environment.NewLine +
                             "\tpath = " + path + Environment.NewLine +
                             "\tautostart = " + autostart + Environment.NewLine +
                             "\tupcomingRemindersTime = " + time + " (in days)" + Environment.NewLine +
@@ -154,35 +168,40 @@ namespace Reminders
             return s;
         }
 
-        public void ShowLog(int type) //use outputwriter here
+        // shows log messages for the different possible errors etc.
+        public void Log(LogType type, string info, [CallerFilePath] string filepath = "", [CallerMemberName] string memberName = "", [CallerLineNumber] int lineNumber = 0)
         {
-            switch (type)
-            {
-                case 0:
-                    simio.WriteLine("");
-                    break;
-                case 2:
-                    simio.WriteLine("log");
-                    break;
-                default:
-                    return; //add error message but only for development mode not the user in general
-            }
-        }
+            string logStartText = "### LOG ### ";
 
-        // shows error messages for the different possible errors caused directly by user input
-        public void ShowError(int type, string info) //use outputwriter here
-        {
-            simio.WriteLine("ERROR");
+            if (devmode)
+                logStartText += Path.GetFileNameWithoutExtension(filepath) + "." + memberName + " (line: " + lineNumber + ") ~ ";
+            
             switch (type)
             {
-                case 0:
-                    simio.WriteLine(info);
+                case LogType.Error:
+                    simio.WriteLine(logStartText + "ERROR: " + info);
                     break;
-                case 2:
-                    simio.WriteLine("error" + info);
+                case LogType.ErrorCritical:
+                    simio.WriteLine(logStartText + "CRITICAL ERROR: " + info);
+                    simio.WriteLine(logStartText + "THIS ERROR PREVENTS THE PROGRAM FROM WORKING, PLEASE RESTART OR TROUBLESHOOT");
+                    simio.WriteLine(logStartText + "press any button to exit...");
+                    simio.ReadLine();
+                    Environment.Exit(-1);
+                    break;
+                case LogType.ErrorEx:
+                    if (devmode)
+                        simio.WriteLine(logStartText + "Exception: " + info);
+                    break;
+                case LogType.Problem:
+                    simio.WriteLine(logStartText + "Problem: " + info);
+                    break;
+                case LogType.Info:
+                    if (devmode)
+                        simio.WriteLine(logStartText + info);
                     break;
                 default:
-                    return; //add error message but only for development mode not the user in general
+                    simio.WriteLine(logStartText + "Problem: unspecific log call");
+                    return;
             }
         }
         
