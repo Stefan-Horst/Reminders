@@ -367,7 +367,7 @@ namespace Reminders
                 {
                     rmdrs.AddRange(reminderMgr.Reminders.FindAll(r => r.ToString().Contains(t)).Except(rmdrs));
                 }
-                writer.ListReminders(rmdrs);
+                writer.PrintRemindersList(rmdrs);
             }
             catch (Exception ex)
             {
@@ -385,7 +385,7 @@ namespace Reminders
             {
                 if (tokens.Length == 1)
                 {
-                    writer.ListReminders(reminderMgr.Reminders);
+                    writer.PrintRemindersList(reminderMgr.Reminders);
                 }
                 else
                 {
@@ -405,7 +405,7 @@ namespace Reminders
 
                     if (tokens.Length == 2 && i == 2)
                     {
-                        writer.ListReminders(reminderMgr.Reminders.FindAll(r => r.Read == Convert.ToBoolean(read)));
+                        writer.PrintRemindersList(reminderMgr.Reminders.FindAll(r => r.Read == Convert.ToBoolean(read)));
                         return;
                     }
 
@@ -418,45 +418,45 @@ namespace Reminders
                             if (validator.IsDateValid(e, out string date2)) //enddate
                             {
                                 if (read == 2)
-                                    writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(ConverterFormatter.ConvertStringToDate(date1), ConverterFormatter.ConvertStringToDate(date2)));
+                                    writer.PrintRemindersList(reminderMgr.GetRemindersDueInTimespan(ConverterFormatter.ConvertStringToDate(date1), ConverterFormatter.ConvertStringToDate(date2)));
                                 else
-                                    writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(ConverterFormatter.ConvertStringToDate(date1), ConverterFormatter.ConvertStringToDate(date2)).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                                    writer.PrintRemindersList(reminderMgr.GetRemindersDueInTimespan(ConverterFormatter.ConvertStringToDate(date1), ConverterFormatter.ConvertStringToDate(date2)).FindAll(r => r.Read == Convert.ToBoolean(read)));
     
                                 return;
                             }
                         }
 
                         if (read == 2)
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(ConverterFormatter.ConvertStringToDate(date1)));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueOnDate(ConverterFormatter.ConvertStringToDate(date1)));
                         else
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(ConverterFormatter.ConvertStringToDate(date1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueOnDate(ConverterFormatter.ConvertStringToDate(date1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
 
                         return;
                     }
                     if (s == "today" || s == "t")
                     {
                         if (read == 2)
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(DateTime.Today));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueOnDate(DateTime.Today));
                         else
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(DateTime.Today).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueOnDate(DateTime.Today).FindAll(r => r.Read == Convert.ToBoolean(read)));
 
                         return;
                     }
                     if (s == "tomorrow" || s == "to")
                     {
                         if (read == 2)
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(DateTime.Today.AddDays(1)));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueOnDate(DateTime.Today.AddDays(1)));
                         else
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(DateTime.Today.AddDays(1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueOnDate(DateTime.Today.AddDays(1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
 
                         return;
                     }
                     if (s == "yesterday" || s == "ye")
                     {
                         if (read == 2)
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(DateTime.Today.AddDays(-1)));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueOnDate(DateTime.Today.AddDays(-1)));
                         else
-                            writer.ListReminders(reminderMgr.GetRemindersDueOnDate(DateTime.Today.AddDays(-1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueOnDate(DateTime.Today.AddDays(-1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
 
                         return;
                     }
@@ -531,16 +531,16 @@ namespace Reminders
                     if (last)
                     {
                         if (read == 2)
-                            writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(date, DateTime.Today));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueInTimespan(date, DateTime.Today));
                         else
-                            writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(date, DateTime.Today).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueInTimespan(date, DateTime.Today).FindAll(r => r.Read == Convert.ToBoolean(read)));
                     }
                     else
                     {
                         if (read == 2)
-                            writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(DateTime.Today, date));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueInTimespan(DateTime.Today, date));
                         else
-                            writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(DateTime.Today, date).FindAll(r => r.Read == Convert.ToBoolean(read)));
+                            writer.PrintRemindersList(reminderMgr.GetRemindersDueInTimespan(DateTime.Today, date).FindAll(r => r.Read == Convert.ToBoolean(read)));
                     }
                 }
             }
