@@ -1,3 +1,4 @@
 ﻿path=default;
 autostart=false;
 upcomingreminderstime=5;
+devmode=true;

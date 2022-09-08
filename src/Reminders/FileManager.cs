@@ -10,18 +10,19 @@ namespace Reminders
     public class FileManager
     {
         private const string ConfigFile = "config.txt";
-        private const int NumConfigArgs = 3;
+        private const int NumConfigArgs = 4;
         private const string ConfigText = "path=default;\n" +
                                           "autostart=false;\n" +
-                                          "upcomingreminderstime=3;";
+                                          "upcomingreminderstime=3;\n" +
+                                          "devmode=false";
         private const int NumRmdrParams = 4;
+        private const string AutostartFilename = "Reminders";
 
         private OutputTextWriter writer;
 
         private readonly string appPath = AppDomain.CurrentDomain.BaseDirectory;
         private string dataPath;
         private string dataFilename = "data.rmdr";
-        private string fileRaw; //first used for loading config, then only for data file (.rmdr) REPLACE WITH LOCAL VARIABLE???
         private int upcomingDays;
         private bool autostart;
         private Reminder[] reminders;
@@ -38,22 +39,40 @@ namespace Reminders
             dataPath = appPath;
             
             if (! LoadConfig())
-                writer.ShowError(0, "loadconfig failed");
-            //give option to reset config
+            {
+                 writer.Log(LogType.Problem, "loading config failed, proceeding with default settings");
+                            
+                 if (! RestoreConfigToDefault())
+                     writer.Log(LogType.ErrorCritical, "restoring config failed");
+            }
 
             if (! LoadData())
-                writer.ShowError(0, "loaddata failed");
+            {
+                writer.Log(LogType.Error, "loading data failed");
+
+                if (! File.Exists(dataPath + ConfigFile))
+                {
+                    if (! SaveData()) // creates new empty data file
+                        writer.Log(LogType.ErrorCritical, "creating data file failed");
+                    
+                    if (! LoadData())
+                        writer.Log(LogType.ErrorCritical, "loading data failed");
+                }
+                else
+                {
+                    writer.Log(LogType.ErrorCritical, "loading data file failed");
+                }
+            }
         }
 
-        // loads config file and applies the settings
-        public bool LoadConfig()
+        // loads config file and applies settings
+        private bool LoadConfig()
         {
             // structure of config file: parameter=value;[newline]... (= and ; characters not used in names or values)
 
-            if (! LoadFile(dataPath, ConfigFile))
+            if (! LoadFile(dataPath, ConfigFile, out string fileRaw))
             {
-                writer.ShowError(0, "loadfile failed");
-                
+                writer.Log(LogType.Error, "loading config file failed");
                 return false;
             }
 
@@ -62,8 +81,7 @@ namespace Reminders
 
             if (lines.Length != NumConfigArgs + 1) //+1 for the extra line which is removed next
             {
-                writer.ShowError(0, "config file incomplete");
-
+                writer.Log(LogType.Error, "config file incomplete");
                 return false;
             }
 
@@ -82,21 +100,38 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                //send error to textwriter: config file is corrupted, wrong syntax used
-                writer.ShowError(0, ex.Message);
+                writer.Log(LogType.Error, ex.Message);
                 return false;
             }
 
             return true;
         }
 
-        private void ApplyConfig(string[] values) //change to bool if arg with possibility of foreseeable errors is added
+        private void ApplyConfig(string[] values)
         {
+            bool error = false;
+            
+            // param: devmode; allowed values: "true" or "false"
+            if (values[3] == "true")
+                writer.Devmode = true;
+            else if (values[3] == "false")
+                writer.Devmode = false;
+            else
+            { 
+                writer.Log(LogType.Error, "config devmode param is wrong");
+                error = true;
+            }
+
+            writer.Log(LogType.Info, "data file loaded successfully: " + ConfigFile); // first info log only possible after devmode init
+            writer.Log(LogType.Info, "devmode: " + writer.Devmode);
+            
             // param: path; allowed values: "default" or any file path
             if (values[0] == "default") //path of application
                 dataPath = appPath;
             else
                 dataPath = values[0];
+            
+            writer.Log(LogType.Info, "datapath: " + dataPath);
 
             // param: autostart; allowed values: "true" or "false"
             if (values[1] == "true")
@@ -106,7 +141,15 @@ namespace Reminders
                 string startupDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
 
                 ShortcutCreator shortcutCreator = new ShortcutCreator();
-                shortcutCreator.CreateShortcut(startupDir);
+                shortcutCreator.CreateShortcut(startupDir, AutostartFilename);
+
+                if (!File.Exists(startupDir))
+                {
+                    writer.Log(LogType.Error, "delete autostart shortcut failed"); 
+                    error = true;
+                }
+                else
+                    writer.Log(LogType.Info, "autostart shortcut created: " + startupDir + "\\" + AutostartFilename + ".lnk");
             }
             else if (values[1] == "false")
             {   //remove from autostart
@@ -115,15 +158,22 @@ namespace Reminders
                 string shortcutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "Reminder.lnk");
 
                 if (File.Exists(shortcutPath))
+                { 
                     File.Delete(shortcutPath);
-                else
-                {
-                    writer.ShowError(0, "delete autostart shortcut failed");
-                    //no return false needed because situation is weird but no negative impact on program
+
+                    if (File.Exists(shortcutPath))
+                    { 
+                        writer.Log(LogType.Error, "delete autostart shortcut failed");
+                        error = true;
+                    }
                 }
             }
-            //no else block, errors will be caught in catch block where this method is called from
-
+            else
+            { 
+                writer.Log(LogType.Error, "config autostart param is wrong");
+                error = true;
+            }
+            
             // param: upcomingreminderstime; allowed values: "-1", "0", or every whole number above zero
             if (values[2] == "-1")
                 upcomingDays = -1;
@@ -131,13 +181,27 @@ namespace Reminders
                 upcomingDays = 0;
             else if (int.Parse(values[2]) > 0)
                 upcomingDays = int.Parse(values[2]);
-            //no else block or tryparse, errors will be caught in catch block where this method is called from
+            else
+            {
+                writer.Log(LogType.Error, "config upcomingRemindersTime param is wrong");
+                error = true;
+            }
+            
+            writer.Log(LogType.Info, "upcomingDays: " + upcomingDays);
+
+            if (! error)
+                writer.Log(LogType.Info, "config loaded and applied successfully");
         }
 
         // overrides config.txt with default text (settings) or creates new config.txt if file was deleted
         public bool RestoreConfigToDefault()
         {
-            return SaveFile(appPath, ConfigFile, ConfigText);
+            bool b = SaveFile(appPath, ConfigFile, ConfigText);
+
+            if (b)
+                writer.Log(LogType.Info, "file saved successfully: " + ConfigFile);
+            
+            return b;
         }
 
         public void SaveConfig()
@@ -146,18 +210,22 @@ namespace Reminders
                                 "autostart=" + autostart + ";\n" +
                                 "upcomingreminderstime=" + upcomingDays + ";";
 
-            SaveFile(dataPath, ConfigFile, configText);
+            if (! SaveFile(dataPath, ConfigFile, configText))
+                writer.Log(LogType.Error, "saving config failed");
+            else
+                writer.Log(LogType.Info, "file saved successfully: " + ConfigFile);
         }
 
-        public bool LoadData()
+        private bool LoadData()
         {
             // structure of data file: YYYYMMDDhhmm;[-1..n <- repeat];[content];[newline]...
 
-            if (! LoadFile(dataPath, dataFilename))
+            if (! LoadFile(dataPath, dataFilename, out string fileRaw))
             {
-                writer.ShowError(0, "loadfile failed");
+                writer.Log(LogType.Error, "loading data failed");
                 return false;
             }
+            writer.Log(LogType.Info, "data file loaded successfully: " + dataFilename);
 
             fileRaw = Regex.Replace(fileRaw, @"\t|\n|\r", ""); //remove all newlines and tabs
 
@@ -190,7 +258,7 @@ namespace Reminders
 
             if (values.Length % NumRmdrParams != 0) //+1 for the extra line which is removed next
             {
-                writer.ShowError(0, "wrong amount of params");
+                writer.Log(LogType.ErrorCritical, "wrong amount of params in data");
                 return false;
             }
 
@@ -209,14 +277,16 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                writer.ShowError(0, ex.Message/*"creation of reminders failed"*/);
+                writer.Log(LogType.ErrorEx, ex.Message);
+                writer.Log(LogType.ErrorCritical, "creation of reminders from data failed");
                 return false;
             }
+            writer.Log(LogType.Info, "data loaded successfully");
 
             return true;
         }
 
-        public bool SaveData()
+        private bool SaveData()
         {
             // structure of data file: YYYYMMDDhhmm;[repeat];[read];[content];[newline]...
 
@@ -244,7 +314,12 @@ namespace Reminders
                 dataText += sb.ToString() + ";\n";
             }
 
-            return SaveFile(dataPath, dataFilename, dataText);
+            bool b = SaveFile(dataPath, dataFilename, dataText);
+
+            if (b)
+                writer.Log(LogType.Info, "file saved successfully: " + dataFilename);
+
+            return b;
         }
 
         public bool ClearData()
@@ -253,8 +328,10 @@ namespace Reminders
         }
 
         // puts input of file in string; returns false if unsuccessful
-        private bool LoadFile(string path, string name)
+        private bool LoadFile(string path, string name, out string fileRaw)
         {
+            fileRaw = "";
+            
             try
             {
                 fileRaw = File.ReadAllText(Path.Combine(path, name));
@@ -262,15 +339,14 @@ namespace Reminders
             catch (Exception ex)
             {
                 fileRaw = "ERROR";
-                writer.ShowError(0, ex.Message);
-
+                writer.Log(LogType.ErrorEx, ex.Message);
                 return false;
             }
 
             return true;
         }
 
-        // saves text in a file (overrides old file or creates new file if does not exist yet), retuns false if unsuccesful
+        // saves text in a file (overrides old file or creates new file if does not exist yet), returns false if unsuccessful
         private bool SaveFile(string path, string name, string content)
         {
             try
@@ -279,30 +355,11 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                writer.ShowError(0, ex.Message);
-
+                writer.Log(LogType.ErrorEx, ex.Message);
                 return false;
             }
 
             return true;
-        }
-
-        // converts the List to a string, separating all entries by commas
-        public string GetAllEntries()   
-        {
-            string s = "";
-            if (reminders.Length > 0)
-                s += reminders[0].ToString();
-
-            if (reminders.Length > 1)
-            {
-                for (int i = 1; i < reminders.Length; i++)
-                {
-                    s += ", " + reminders[i].ToString();
-                }
-            }
-
-            return s;
         }
 
         public string Filename
@@ -326,7 +383,9 @@ namespace Reminders
                 if (value != dataPath)
                 {
                     dataPath = value;
-                    SaveData();
+                    
+                    if (SaveData())
+                        writer.Log(LogType.Error, "saving data failed");
                 }
             }
         }
@@ -339,7 +398,9 @@ namespace Reminders
                 if (value != reminders)
                 {
                     reminders = value;
-                    SaveData();
+                    
+                    if (SaveData())
+                        writer.Log(LogType.Error, "saving data failed");
                 }
             }
         }
