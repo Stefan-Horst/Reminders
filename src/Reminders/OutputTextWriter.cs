@@ -184,10 +184,10 @@ namespace Reminders
             switch (type)
             {
                 case LogType.Error:
-                    simio.WriteLine(logStartText + "ERROR: " + info);
+                    simio.WriteLine(logStartText + "[ERROR] " + info);
                     break;
                 case LogType.ErrorCritical:
-                    simio.WriteLine(logStartText + "CRITICAL ERROR: " + info);
+                    simio.WriteLine(logStartText + "[CRITICAL ERROR] " + info);
                     simio.WriteLine(logStartText + "THIS ERROR PREVENTS THE PROGRAM FROM WORKING, PLEASE RESTART OR TROUBLESHOOT");
                     simio.WriteLine(logStartText + "press any button to exit...");
                     simio.ReadLine();
@@ -195,14 +195,14 @@ namespace Reminders
                     break;
                 case LogType.ErrorEx:
                     if (devmode)
-                        simio.WriteLine(logStartText + "Exception: " + info);
+                        simio.WriteLine(logStartText + "[Exception] " + info);
                     break;
                 case LogType.Problem:
-                    simio.WriteLine(logStartText + "Problem: " + info);
+                    simio.WriteLine(logStartText + "[Problem] " + info);
                     break;
                 case LogType.Info:
                     if (devmode)
-                        simio.WriteLine(logStartText + info);
+                        simio.WriteLine(logStartText + "[Info] " + info);
                     break;
                 default:
                     simio.WriteLine(logStartText + "Problem: unspecific log call");
