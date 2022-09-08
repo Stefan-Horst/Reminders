@@ -392,29 +392,38 @@ namespace Reminders
                     int i = 1;
 
                     int read = 2;
-                    if (tokens[1] == "read")
+                    if (tokens[1] == "read" || tokens[1] == "r")
                     {
                         read = 1;
                         i++;
                     }
-                    else if (tokens[1] == "unread")
+                    else if (tokens[1] == "unread" || tokens[1] == "ur")
                     {
                         read = 0;
                         i++;
                     }
 
+                    if (tokens.Length == 2 && i == 2)
+                    {
+                        writer.ListReminders(reminderMgr.Reminders.FindAll(r => r.Read == Convert.ToBoolean(read)));
+                        return;
+                    }
+
                     string s = tokens[i]/*.Replace(".", "")*/; //replace only necessary for dates
                     if (validator.IsDateValid(s, out string date1)) //startdate
                     {
-                        string e = tokens[i + 1]/*.Replace(".", "")*/;
-                        if (validator.IsDateValid(e, out string date2)) //enddate
+                        if (tokens.Length > i + 1)
                         {
-                            if (read == 2)
-                                writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(ConverterFormatter.ConvertStringToDate(date1), ConverterFormatter.ConvertStringToDate(date2)));
-                            else
-                                writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(ConverterFormatter.ConvertStringToDate(date1), ConverterFormatter.ConvertStringToDate(date2)).FindAll(r => r.Read == Convert.ToBoolean(read)));
-
-                            return;
+                            string e = tokens[i + 1]/*.Replace(".", "")*/;
+                            if (validator.IsDateValid(e, out string date2)) //enddate
+                            {
+                                if (read == 2)
+                                    writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(ConverterFormatter.ConvertStringToDate(date1), ConverterFormatter.ConvertStringToDate(date2)));
+                                else
+                                    writer.ListReminders(reminderMgr.GetRemindersDueInTimespan(ConverterFormatter.ConvertStringToDate(date1), ConverterFormatter.ConvertStringToDate(date2)).FindAll(r => r.Read == Convert.ToBoolean(read)));
+    
+                                return;
+                            }
                         }
 
                         if (read == 2)

@@ -127,7 +127,7 @@ namespace Reminders
 
         public List<Reminder> GetRemindersDueOnDate(DateTime date)
         {
-            return GetRemindersDueInTimespan(date, date);
+            return GetRemindersDueInTimespan(date.Date, date.Date.AddHours(23).AddMinutes(59));
         }
 
         public List<Reminder> GetRemindersDueInTimespan(DateTime start, DateTime end)
