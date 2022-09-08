@@ -17,7 +17,8 @@ namespace Reminders
         private int idIterator; //no need for static as ids are assigned during (each) runtime
 
         public int UpcomingDays { get => upcomingDays; set => upcomingDays = value; }
-        public List<Reminder> Reminders { get => reminders; }
+        public List<Reminder> Reminders { get => reminders; set { reminders = value; fileMgr.Reminders = reminders.ToArray(); } } //filemgr then updates savefile
+
         public FileManager FileMgr { get => fileMgr; }
         
         public ReminderManager(OutputTextWriter outputTextWriter)
@@ -63,7 +64,7 @@ namespace Reminders
         }
 
         // updates date of reminder to next date if repeat is enabled
-        public void SetReminderToNextDate(int id)
+        public void SetReminderToNextDate(int id) // user of this method must then update reminders in filemanager
         {
             Reminder r = ReadReminder(id);
             
@@ -110,19 +111,32 @@ namespace Reminders
         public void MarkReminder(int id, bool read)
         {
             ReadReminder(id).Read = read;
+            
+            fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
         }
 
+        // handles due reminders and generates output for textprovider
         public string GetDueRemindersOutput()
         {
-            string s;
             List<Reminder> rmdrs = GetDueReminders(DateTime.Now);
             rmdrs.RemoveAll(r => shownReminders.Contains(r.Id)); // remove reminders that have already been shown
-            
-            shownReminders.AddRange(rmdrs.Select(r => r.Id).ToList());
 
-            s = rmdrs.Count > 0 ? writer.DueReminders(rmdrs) : "";
+            if (rmdrs.Count > 0)
+            {
+                shownReminders.AddRange(rmdrs.Select(r => r.Id).ToList());
+                
+                foreach (int id in shownReminders)
+                {
+                    if(ReadReminder(id).Read == true)
+                        SetReminderToNextDate(id);
+                }
+                
+                fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
+
+                return writer.DueReminders(rmdrs);
+            }
             
-            return s;
+            return "";
         }
 
         public List<Reminder> GetRemindersDueOnDate(DateTime date)
