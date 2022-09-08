@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +28,10 @@ namespace Reminders
             Init();
 
             writer.ShowWelcome(); //todo 2 methods first only void, add args of method to config (or data?)
-            writer.ShowWelcomeReminders(reminderMgr.UpcomingDays, reminderMgr.GetRemindersDueInTimespan(DateTime.Today, DateTime.Today.AddDays(reminderMgr.UpcomingDays)));
+            if (reminderMgr.UpcomingDays == -1) // show all (non-read) reminders
+                writer.ShowWelcomeReminders(reminderMgr.UpcomingDays, reminderMgr.Reminders.FindAll(r => r.Read == false));
+            else
+                writer.ShowWelcomeReminders(reminderMgr.UpcomingDays, reminderMgr.GetRemindersDueInTimespan(DateTime.Today, DateTime.Today.AddDays(reminderMgr.UpcomingDays)));
             
             while (true) // main program loop
                 cmdExec.Execute(simio.ReadLine(">>> "));
@@ -44,9 +48,9 @@ namespace Reminders
             simio.TextProvider = new TextProvider(reminderMgr);
             cmdExec = new CommandExecutor(writer, reminderMgr);
 
-            DisableQuickEdit dqe = new DisableQuickEdit(); //TODO still needed???
+            DisableQuickEdit dqe = new DisableQuickEdit();
             if (!dqe.Disable())
-                writer.ShowError(0, ""); //give user info that console wont get updated if he clicks anywhere in it
+                writer.Log(0, ""); //give user info that console wont get updated if he clicks anywhere in it
             
             /* while (true)
              {
@@ -66,7 +70,7 @@ namespace Reminders
             });*/
         }
 
-        private static void Test() //method only temporary
+        /*private static void Test() //method only temporary
         {
             Console.OutputEncoding = Encoding.Unicode;
 
@@ -109,10 +113,10 @@ namespace Reminders
             //Task.Run(() => CmdOutputThread());
             /*Thread.Sleep(2000);
             NotificationWindow nw = new NotificationWindow();
-            nw.Display("test 1 test 2 test 3 test 4");*/
+            nw.Display("test 1 test 2 test 3 test 4");*//*
             Console.WriteLine("MSG CLOSED"); //is only displayed after msgbox is closed NOTIFY USER OF MSGBOX IN CONSOLE THEN DEL MSG IN CMD AFTER CLOSE OF MSGBOX
             //string s = Console.ReadLine();
             //Console.Write("test");Console.CursorLeft--; Console.Write(" \b");Console.ReadLine();
-        }
+        }*/
     }
 }

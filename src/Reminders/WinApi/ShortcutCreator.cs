@@ -6,23 +6,19 @@ using System.Text;
 
 namespace Reminders.WinApi
 {
-    class ShortcutCreator
+    public class ShortcutCreator
     {
-        public void CreateShortcut(String path)
+        public void CreateShortcut(string path, string filename)
         {
-            IShellLink link = (IShellLink)new ShellLink();
+            IShellLink link = (IShellLink) new ShellLink();
 
             // setup shortcut information
-            link.SetDescription("Startup Folder Shortcut for Reminder Application");
+            link.SetDescription("Startup Folder Shortcut for Reminders Application");
             link.SetPath(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             // save it
-            IPersistFile file = (IPersistFile)link;
-            file.Save(Path.Combine(path, "Reminder.lnk"), false);
-
-            Console.WriteLine(link.ToString());
-            Console.WriteLine(file.ToString());
-            Console.WriteLine(Path.Combine(path, "Reminder.lnk"));
+            IPersistFile file = (IPersistFile) link;
+            file.Save(Path.Combine(path, filename + ".lnk"), false);
         }
     }
 

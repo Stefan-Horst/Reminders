@@ -23,7 +23,7 @@ namespace Reminders
 
         private const string ReminderStartText = "\t> ";
         private int reminderStartTotalLength;
-        private bool devmode = false;
+        private bool devmode;
 
         public bool Devmode { get => devmode; set => devmode = value; }
         
@@ -57,7 +57,12 @@ namespace Reminders
 
         public void ShowWelcomeReminders(int days, List<Reminder> reminders)
         {
-            if (reminders.Count > 0)
+            if (reminders.Count == -1)
+            {
+                simio.WriteLine("Here are all upcoming reminders:");
+                simio.WriteLine(ConverterFormatter.FormatRemindersFull(reminders, ReminderStartText) + Environment.NewLine);
+            }
+            else if (reminders.Count > 0)
             {
                 simio.WriteLine("Here are all reminders for the next " + ConverterFormatter.FormatTime(days) + ":");
                 simio.WriteLine(ConverterFormatter.FormatRemindersFull(reminders, ReminderStartText) + Environment.NewLine);

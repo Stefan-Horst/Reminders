@@ -548,7 +548,10 @@ namespace Reminders
                 }
                 else if (tokens.Length == 2 && tokens[1] == "reset")
                 {
-                    reminderMgr.FileMgr.RestoreConfigToDefault();
+                    if (reminderMgr.FileMgr.RestoreConfigToDefault())
+                        writer.Log(LogType.Info, "config reset successful");
+                    else
+                        writer.Log(LogType.Error, "config reset failed");
                 }
                 else if (tokens.Length == 3)
                 {
@@ -573,8 +576,14 @@ namespace Reminders
                         case "upcomingreminderstime":
                         case "upcomingRemindersTime":
                         case "time":
-                            reminderMgr.FileMgr.UpcomingDays = int.Parse(tokens[2]);
-                            writer.EditConfig("upcomingRemindersTime = " + int.Parse(tokens[2]));
+                            int days = int.Parse(tokens[2]);
+                            if (days >= -1)
+                            {
+                                reminderMgr.FileMgr.UpcomingDays = days; 
+                                writer.EditConfig("upcomingRemindersTime = " + days);
+                            }
+                            else
+                                writer.Log(LogType.Error, "wrong args");
                             break;
                         default:
                             writer.ShowError(0, "wrong args");
