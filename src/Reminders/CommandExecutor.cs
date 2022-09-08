@@ -92,7 +92,7 @@ namespace Reminders
                     break;
 
                 default:
-                    writer.ShowError(0, "wrong command");
+                    writer.Log(LogType.Problem, "wrong command");
                     break;
             }
         }
@@ -107,7 +107,7 @@ namespace Reminders
 
                 if (!b)
                 {
-                    writer.ShowError(0, "wrong id format");
+                    writer.Log(LogType.Error, "wrong id format");
                     return;
                 }
 
@@ -115,7 +115,8 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                writer.ShowError(0, ex.Message);
+                writer.Log(LogType.Error, "reading reminder failed");
+                writer.Log(LogType.ErrorEx, ex.Message);
             }
         }
 
@@ -127,7 +128,7 @@ namespace Reminders
             {
                 if (! validator.IsDateValid(tokens[1], out string date))
                 {
-                    writer.ShowError(0, "wrong date arg");
+                    writer.Log(LogType.Error, "wrong date argument");
                     return;
                 }
 
@@ -204,8 +205,8 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                //Console.WriteLine("SSS");
-                writer.ShowError(0, ex.Message);
+                writer.Log(LogType.Error, "creating reminder failed");
+                writer.Log(LogType.ErrorEx, ex.Message);
             }
         }
 
@@ -221,7 +222,7 @@ namespace Reminders
 
                 if (!b)
                 {
-                    writer.ShowError(0, "wrong id format");
+                    writer.Log(LogType.Error, "wrong id format");
                     return;
                 }
 
@@ -230,7 +231,8 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                writer.ShowError(0, ex.Message);
+                writer.Log(LogType.Error, "deleting reminder failed");
+                writer.Log(LogType.ErrorEx, ex.Message);
             }
         }
 
@@ -281,7 +283,8 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                writer.ShowError(0, ex.Message);
+                writer.Log(LogType.Error, "updating reminder failed");
+                writer.Log(LogType.ErrorEx, ex.Message);
             }
         }
 
@@ -293,7 +296,7 @@ namespace Reminders
             {
                 if (tokens.Length != 2)
                 {
-                   writer.ShowError(0, "wrong args");
+                   writer.Log(LogType.Error, "wrong arguments");
                    return;
                 }
 
@@ -305,8 +308,9 @@ namespace Reminders
                 writer.UpdateReminder(rClone , r);
             }
             catch (Exception ex)
-            { 
-                writer.ShowError(0, ex.Message);
+            {
+                writer.Log(LogType.Error, "editing reminder failed");
+                writer.Log(LogType.ErrorEx, ex.Message);
             }
         }
 
@@ -354,7 +358,7 @@ namespace Reminders
                 }
                 else
                 {
-                    writer.ShowError(0, "no arguments");
+                    writer.Log(LogType.Error, "missing arguments");
                     return;
                 }
 
@@ -367,7 +371,8 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                writer.ShowError(0, ex.Message);
+                writer.Log(LogType.Error, "search failed");
+                writer.Log(LogType.ErrorEx, ex.Message);
             }
         }
 
@@ -510,7 +515,7 @@ namespace Reminders
                     }
                     else
                     {
-                        writer.ShowError(0, "command not valid");
+                        writer.Log(LogType.Error, "command not valid");
                         return;
                     }
 
@@ -532,7 +537,8 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                writer.ShowError(0, ex.Message);
+                writer.Log(LogType.Error, "showing reminders failed");
+                writer.Log(LogType.ErrorEx, ex.Message);
             }
         }
 
@@ -568,7 +574,7 @@ namespace Reminders
                                 reminderMgr.FileMgr.Autostart = false;
                             else
                             {
-                                writer.ShowError(0, "wrong args");
+                                writer.Log(LogType.Error, "wrong arguments");
                                 return;
                             }
                             writer.EditConfig("autostart = " + reminderMgr.FileMgr.Autostart);
@@ -583,22 +589,23 @@ namespace Reminders
                                 writer.EditConfig("upcomingRemindersTime = " + days);
                             }
                             else
-                                writer.Log(LogType.Error, "wrong args");
+                                writer.Log(LogType.Error, "wrong arguments");
                             break;
                         default:
-                            writer.ShowError(0, "wrong args");
+                            writer.Log(LogType.Error, "wrong arguments");
                             return;
                     }
                     reminderMgr.FileMgr.SaveConfig();
                 }
                 else
                 {
-                    writer.ShowError(0, "wrong args");
+                    writer.Log(LogType.Error, "wrong arguments");
                 }
             }
             catch (Exception ex)
             {
-                writer.ShowError(0, ex.Message);
+                writer.Log(LogType.Error, "changing config failed, wrong id format");
+                writer.Log(LogType.ErrorEx, ex.Message);
             }
         }
 

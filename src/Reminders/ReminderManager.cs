@@ -30,7 +30,8 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                writer.ShowError(0, ex.Message);
+                writer.Log(LogType.ErrorEx, ex.Message);
+                writer.Log(LogType.ErrorCritical, "fileManager could not be created");
                 return; // fatal error, end program
             }
 
@@ -40,9 +41,18 @@ namespace Reminders
         private void Init()
         {
             upcomingDays = fileMgr.UpcomingDays;
-            
-            reminders = fileMgr.Reminders != null ? fileMgr.Reminders.ToList() : new List<Reminder>();
 
+            if (fileMgr.Reminders == null)
+            {
+                writer.Log(LogType.Info, "reminders are null");
+                reminders = new List<Reminder>();
+            }
+            else
+            {
+                reminders = fileMgr.Reminders.ToList();
+                writer.Log(LogType.Info, "reminders initialized");
+            }
+            
             idIterator = 0;
 
             foreach (Reminder r in reminders)
@@ -89,8 +99,10 @@ namespace Reminders
                 }
                 else
                 {
-                    writer.ShowError(0, "set reminder to next date failed");
+                    writer.Log(LogType.Error, "set reminder to next date failed");
+                    return;
                 }
+                writer.Log(LogType.Info, "reminder set to new date: " + time + unit);
             }
         }
 
@@ -176,7 +188,7 @@ namespace Reminders
             }
             else
             {
-                writer.ShowError(0, "readreminder failed");
+                writer.Log(LogType.Error, "reading reminder failed");
                 throw new InvalidOperationException("No Reminder with ID " + id + " found.");
             }
         }
@@ -213,7 +225,7 @@ namespace Reminders
             }
             else
             {
-                writer.ShowError(0, "deletereminder failed");
+                writer.Log(LogType.Error, "deleting reminder failed");
                 //return false;
                 throw new InvalidOperationException("No Reminder with ID " + id + " found.");
             }
@@ -231,7 +243,7 @@ namespace Reminders
             }
             else
             {
-                writer.ShowError(0, "updatereminder failed");
+                writer.Log(LogType.Error, "updating reminder failed");
                 //return false;
                 throw new InvalidOperationException("No Reminder with ID " + id + " found.");
             }
