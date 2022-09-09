@@ -297,6 +297,8 @@ namespace Reminders
                         }
                         r.Content = sb.ToString();
 
+                        reminderMgr.UpdateReminder(r.Id, r);
+
                         writer.UpdateReminder(rClone, r);
                         return;
                     }

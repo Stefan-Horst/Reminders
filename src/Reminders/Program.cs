@@ -33,7 +33,7 @@ namespace Reminders
             if (reminderMgr.FileMgr.UpcomingDays == -1) // show all (non-read) reminders
                 writer.ShowWelcomeReminders(reminderMgr.FileMgr.UpcomingDays, reminderMgr.Reminders.FindAll(r => r.Read == false));
             else
-                writer.ShowWelcomeReminders(reminderMgr.FileMgr.UpcomingDays, reminderMgr.GetRemindersDueInTimespan(DateTime.Today, DateTime.Today.AddDays(reminderMgr.FileMgr.UpcomingDays)));
+                writer.ShowWelcomeReminders(reminderMgr.FileMgr.UpcomingDays, reminderMgr.GetRemindersDueInTimespan(DateTime.Today, DateTime.Today.AddDays(reminderMgr.FileMgr.UpcomingDays)).FindAll(r => r.Read == false));
             
             while (true) // main program loop
                 cmdExec.Execute(simio.ReadLine(Prompt));

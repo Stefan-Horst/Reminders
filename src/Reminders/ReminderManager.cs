@@ -111,6 +111,12 @@ namespace Reminders
         public void MarkReminder(int id, bool read)
         {
             ReadReminder(id).Read = read;
+
+            if (read == true)
+            {
+                SetReminderToNextDate(id);
+                ReadReminder(id).Read = false;
+            }
             
             fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
         }
@@ -121,27 +127,39 @@ namespace Reminders
             try
             {
                 List<Reminder> rmdrs = GetDueReminders(DateTime.Now);
-                rmdrs.RemoveAll(r => shownReminders.Contains(r.Id)); // remove reminders that have already been shown
 
                 if (rmdrs.Count > 0)
                 {
-                    shownReminders.AddRange(rmdrs.Select(r => r.Id).ToList());
-                    
-                    foreach (int id in shownReminders)
-                    {
-                        if(ReadReminder(id).Read == true)
-                            SetReminderToNextDate(id);
-                    }
-                    
-                    fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
+                    rmdrs.RemoveAll(r => shownReminders.Contains(r.Id)); // remove reminders that have already been shown
 
-                    if (fileMgr.Notification == true)
+                    if (rmdrs.Count > 0)
                     {
-                        NotificationWindow notification = new NotificationWindow();
-                        notification.Display("A reminder is due!"); // show notification window
+                        rmdrs.RemoveAll(r => r.Read == true); // remove all marked as read reminders
+                        
+                        if (rmdrs.Count > 0)
+                        {
+                            shownReminders.AddRange(rmdrs.Select(r => r.Id).ToList());
+                                                
+                            foreach (int id in shownReminders)
+                            {
+                                if (ReadReminder(id).Read == true)
+                                {
+                                    SetReminderToNextDate(id);
+                                    ReadReminder(id).Read = false;
+                                }
+                            }
+                            
+                            fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
+        
+                            if (fileMgr.Notification == true)
+                            {
+                                NotificationWindow notification = new NotificationWindow();
+                                notification.Display("A reminder is due!"); // show notification window
+                            }
+        
+                            return writer.DueReminders(rmdrs);
+                        }
                     }
-
-                    return writer.DueReminders(rmdrs);
                 }
             }
             catch (Exception ex)

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <StartupObject></StartupObject>
+    <StartupObject>Reminders.Program</StartupObject>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -14,9 +14,6 @@
 
 	<ItemGroup>
 	  <None Update="config.txt">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="data.rmdr">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
