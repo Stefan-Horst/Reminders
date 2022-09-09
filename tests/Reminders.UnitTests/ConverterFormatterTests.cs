@@ -69,7 +69,64 @@ namespace Reminders.UnitTests
             Assert.AreEqual(se06, sa07);
             Assert.AreEqual(se07, sa08);
         }
+
+        [TestMethod]
+        public void AddTimespanToDateTime_StandardBehaviour()
+        {
+            string datetimeFormat = "ddMMyyyyHHmm";
+            DateTime dt = new DateTime(2040, 12, 20, 23, 59, 0);
+
+            string se = "211220400009";
+            string se1 = "211220400959";
+            string se2 = "301220402359";
+            string se3 = "271220402359";
+            string se4 = "200120412359";
+            string se5 = "201220412359";
+            string se6 = "010100010000";
+            string sa = ConverterFormatter.AddTimespanToDateTime(10, "minutes", dt).ToString(datetimeFormat);
+            string sa1 = ConverterFormatter.AddTimespanToDateTime(10, "hours", dt).ToString(datetimeFormat);
+            string sa2 = ConverterFormatter.AddTimespanToDateTime(10, "days", dt).ToString(datetimeFormat);
+            string sa3 = ConverterFormatter.AddTimespanToDateTime(1, "week", dt).ToString(datetimeFormat);
+            string sa4 = ConverterFormatter.AddTimespanToDateTime(1, "month", dt).ToString(datetimeFormat);
+            string sa5 = ConverterFormatter.AddTimespanToDateTime(1, "year", dt).ToString(datetimeFormat);
+            string sa6 = ConverterFormatter.AddTimespanToDateTime(0, "minutes", dt).ToString(datetimeFormat);
+
+            Assert.AreEqual(se, sa);
+            Assert.AreEqual(se1, sa1);
+            Assert.AreEqual(se2, sa2);
+            Assert.AreEqual(se3, sa3);
+            Assert.AreEqual(se4, sa4);
+            Assert.AreEqual(se5, sa5);
+            Assert.AreEqual(se6, sa6);
+        }
         
+        [TestMethod]
+        public void AddTimespanToDateTime_withCutoff_StandardBehaviour()
+        {
+            string datetimeFormat = "ddMMyyyyHHmm";
+            DateTime dt = new DateTime(2040, 12, 20, 23, 59, 0);
+
+            string se = "211220400009";
+            string se1 = "211220400959";
+            string se2 = "301220400000";
+            string se3 = "271220400000";
+            string se4 = "200120410000";
+            string se5 = "201220410000";
+            string sa = ConverterFormatter.AddTimespanToDateTime(10, "minutes", dt, true).ToString(datetimeFormat);
+            string sa1 = ConverterFormatter.AddTimespanToDateTime(10, "hours", dt, true).ToString(datetimeFormat);
+            string sa2 = ConverterFormatter.AddTimespanToDateTime(10, "days", dt, true).ToString(datetimeFormat);
+            string sa3 = ConverterFormatter.AddTimespanToDateTime(1, "week", dt, true).ToString(datetimeFormat);
+            string sa4 = ConverterFormatter.AddTimespanToDateTime(1, "month", dt, true).ToString(datetimeFormat);
+            string sa5 = ConverterFormatter.AddTimespanToDateTime(1, "year", dt, true).ToString(datetimeFormat);
+
+            Assert.AreEqual(se, sa);
+            Assert.AreEqual(se1, sa1);
+            Assert.AreEqual(se2, sa2);
+            Assert.AreEqual(se3, sa3);
+            Assert.AreEqual(se4, sa4);
+            Assert.AreEqual(se5, sa5);
+        }
+
         [TestMethod]
         public void ConvertToMinutes_StandardBehaviour()
         {

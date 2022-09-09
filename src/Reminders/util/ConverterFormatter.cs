@@ -40,6 +40,42 @@ namespace Reminders.util
 
             return time + unit;
         }
+
+        // cutoff adds the timespan to just the date by removing the time i.e. setting it to 0
+        public static DateTime AddTimespanToDateTime(int time, string unit, DateTime datetime, bool cutoff = false)
+        {
+            if (time > 0)
+            {
+                unit = unit.Replace("s", "");
+                
+                if (unit == "minute")
+                {
+                    return datetime.AddMinutes(time);
+                }
+                if (unit == "hour")
+                {
+                    return datetime.AddHours(time);
+                }
+                if (unit == "day")
+                {
+                    return cutoff ? datetime.Date.AddDays(time) : datetime.AddDays(time);
+                }
+                if (unit == "week")
+                {
+                    return cutoff ? datetime.Date.AddDays(time * 7) : datetime.AddDays(time * 7);
+                }
+                if (unit == "month")
+                {
+                    return cutoff ? datetime.Date.AddMonths(time) : datetime.AddMonths(time);
+                }
+                if (unit == "year")
+                {
+                    return cutoff ? datetime.Date.AddYears(time) : datetime.AddYears(time);
+                }
+            }
+            
+            return new DateTime();
+        } 
         
         public static int ConvertToMinutes(string raw, int time)
         {

@@ -74,7 +74,7 @@ namespace Reminders
 
                 unit = unit.Replace("s", "");
                 
-                if (unit == "minute")
+                /*if (unit == "minute")
                 {
                     r.Date = r.Date.AddMinutes(time);
                 }
@@ -102,7 +102,10 @@ namespace Reminders
                 {
                     writer.Log(LogType.Error, "set reminder to next date failed");
                     return;
-                }
+                }*/
+
+                r.Date = ConverterFormatter.AddTimespanToDateTime(time, unit, r.Date);
+                
                 writer.Log(LogType.Info, "reminder set to new date: " + time + unit);
             }
         }
