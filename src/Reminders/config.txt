@@ -1,4 +1,6 @@
 ﻿path=default;
 autostart=false;
 upcomingreminderstime=5;
-devmode=false;
+devmode=true;
+notification=true;
+quickedit=false;

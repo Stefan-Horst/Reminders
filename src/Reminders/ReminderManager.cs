@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Reminders.util;
+using Reminders.WinApi;
 
 namespace Reminders
 {
@@ -10,13 +11,11 @@ namespace Reminders
         private OutputTextWriter writer;
         private FileManager fileMgr;
 
-        private int upcomingDays;
         private List<Reminder> reminders;
         private List<int> shownReminders = new List<int>(); // reminders (ids) in this list will not be shown again as due during runtime
 
         private int idIterator; //no need for static as ids are assigned during (each) runtime
 
-        public int UpcomingDays { get => upcomingDays; set => upcomingDays = value; }
         public List<Reminder> Reminders { get => reminders; set { reminders = value; fileMgr.Reminders = reminders.ToArray(); } } //filemgr then updates savefile
 
         public FileManager FileMgr { get => fileMgr; }
@@ -41,8 +40,6 @@ namespace Reminders
 
         private void Init()
         {
-            upcomingDays = fileMgr.UpcomingDays;
-
             if (fileMgr.Reminders == null)
             {
                 writer.Log(LogType.Info, "reminders are null");
@@ -137,6 +134,12 @@ namespace Reminders
                     }
                     
                     fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
+
+                    if (fileMgr.Notification == true)
+                    {
+                        NotificationWindow notification = new NotificationWindow();
+                        notification.Display("A reminder is due!"); // show notification window
+                    }
 
                     return writer.DueReminders(rmdrs);
                 }

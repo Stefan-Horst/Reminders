@@ -18,6 +18,8 @@ namespace Reminders
         private static ReminderManager reminderMgr;
         private static CommandExecutor cmdExec;
         private static SimulConsoleIO simio;
+
+        private const string Prompt = ">>> ";
         /*private static Queue<string> outputTextQueue = new Queue<string>();
         private static StringBuilder cmdInput = new StringBuilder();*/
 
@@ -28,13 +30,13 @@ namespace Reminders
             Init();
 
             writer.ShowWelcome(); //todo 2 methods first only void, add args of method to config (or data?)
-            if (reminderMgr.UpcomingDays == -1) // show all (non-read) reminders
-                writer.ShowWelcomeReminders(reminderMgr.UpcomingDays, reminderMgr.Reminders.FindAll(r => r.Read == false));
+            if (reminderMgr.FileMgr.UpcomingDays == -1) // show all (non-read) reminders
+                writer.ShowWelcomeReminders(reminderMgr.FileMgr.UpcomingDays, reminderMgr.Reminders.FindAll(r => r.Read == false));
             else
-                writer.ShowWelcomeReminders(reminderMgr.UpcomingDays, reminderMgr.GetRemindersDueInTimespan(DateTime.Today, DateTime.Today.AddDays(reminderMgr.UpcomingDays)));
+                writer.ShowWelcomeReminders(reminderMgr.FileMgr.UpcomingDays, reminderMgr.GetRemindersDueInTimespan(DateTime.Today, DateTime.Today.AddDays(reminderMgr.FileMgr.UpcomingDays)));
             
             while (true) // main program loop
-                cmdExec.Execute(simio.ReadLine(">>> "));
+                cmdExec.Execute(simio.ReadLine(Prompt));
         }
 
         private static void Init()
@@ -47,10 +49,21 @@ namespace Reminders
             reminderMgr = new ReminderManager(writer);
             simio.TextProvider = new TextProvider(reminderMgr);
             cmdExec = new CommandExecutor(writer, reminderMgr);
+            
+            if (reminderMgr.FileMgr.Quickedit == false)
+            {
+                DisableQuickEdit dqe = new DisableQuickEdit();
 
-            DisableQuickEdit dqe = new DisableQuickEdit();
-            if (!dqe.Disable())
-                writer.Log(0, ""); //give user info that console wont get updated if he clicks anywhere in it
+                if (!dqe.Disable())
+                    writer.Log(LogType.Error, "disabling quickedit failed"); //give user info that console wont get updated if he clicks anywhere in it
+                else
+                    writer.Log(LogType.Info, "quickedit disabled");
+            }
+            else
+            {
+                writer.Log(LogType.Info, "quickedit enabled");
+            }
+            
             
             /* while (true)
              {

@@ -10,11 +10,13 @@ namespace Reminders
     public class FileManager
     {
         private const string ConfigFile = "config.txt";
-        private const int NumConfigArgs = 4;
+        private const int NumConfigArgs = 6;
         private const string ConfigText = "path=default;\n" +
                                           "autostart=false;\n" +
                                           "upcomingreminderstime=3;\n" +
-                                          "devmode=false";
+                                          "devmode=false\n" +
+                                          "notification=true\n" +
+                                          "quickedit=false";
         private const int NumRmdrParams = 4;
         private const string AutostartFilename = "Reminders";
 
@@ -25,6 +27,8 @@ namespace Reminders
         private string dataFilename = "data.rmdr";
         private int upcomingDays;
         private bool autostart;
+        private bool notification;
+        private bool quickedit;
         private Reminder[] reminders;
 
         public FileManager(OutputTextWriter outputTextWriter)
@@ -117,7 +121,7 @@ namespace Reminders
             else if (values[3] == "false")
                 writer.Devmode = false;
             else
-            { 
+            {
                 writer.Log(LogType.Error, "config devmode param is wrong");
                 error = true;
             }
@@ -169,7 +173,7 @@ namespace Reminders
                 }
             }
             else
-            { 
+            {
                 writer.Log(LogType.Error, "config autostart param is wrong");
                 error = true;
             }
@@ -188,6 +192,32 @@ namespace Reminders
             }
             
             writer.Log(LogType.Info, "upcomingDays: " + upcomingDays);
+            
+            // param: notification; allowed values: "true" or "false"
+            if (values[4] == "true")
+                notification = true;
+            else if (values[4] == "false")
+                notification = false;
+            else
+            {
+                writer.Log(LogType.Error, "config notification param is wrong");
+                error = true;
+            }
+            
+            writer.Log(LogType.Info, "notification: " + notification);
+
+            // param: quickedit; allowed values: "true" or "false"
+            if (values[5] == "true")
+                quickedit = true;
+            else if (values[5] == "false")
+                quickedit = false;
+            else
+            {
+                writer.Log(LogType.Error, "config quickedit param is wrong");
+                error = true;
+            }
+            
+            writer.Log(LogType.Info, "quickedit: " + quickedit);
 
             if (! error)
                 writer.Log(LogType.Info, "config loaded and applied successfully");
@@ -208,7 +238,12 @@ namespace Reminders
         {
             string configText = "path=" + dataPath + ";\n" +
                                 "autostart=" + autostart + ";\n" +
-                                "upcomingreminderstime=" + upcomingDays + ";";
+                                "upcomingreminderstime=" + upcomingDays + ";\n" +
+                                "devmode=" + writer.Devmode + ";\n" + 
+                                "notification=" + notification + ";\n" +
+                                "quickedit=" + quickedit + ";\n";
+            
+            ApplyConfig(new string[] {dataPath, "" + autostart, "" + upcomingDays, "" + writer.Devmode, "" + notification, "" + quickedit});
 
             if (! SaveFile(dataPath, ConfigFile, configText))
                 writer.Log(LogType.Error, "saving config failed");
@@ -426,6 +461,32 @@ namespace Reminders
                 if (value != autostart)
                 {
                     autostart = value;
+                    SaveConfig();
+                }
+            }
+        }
+        
+        public bool Notification
+        {
+            get => notification;
+            set
+            {
+                if (value != notification)
+                {
+                    notification = value;
+                    SaveConfig();
+                }
+            }
+        }
+        
+        public bool Quickedit
+        {
+            get => quickedit;
+            set
+            {
+                if (value != quickedit)
+                {
+                    quickedit = value;
                     SaveConfig();
                 }
             }

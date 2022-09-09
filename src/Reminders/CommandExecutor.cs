@@ -631,6 +631,44 @@ namespace Reminders
                             else
                                 writer.Log(LogType.Error, "wrong arguments");
                             break;
+                        case "devmode":
+                        case "devMode":
+                            if (tokens[2] == "true" || tokens[2] == "yes" || tokens[2] == "1")
+                                writer.Devmode = true;
+                            else if (tokens[2] == "false" || tokens[2] == "no" || tokens[2] == "0")
+                                writer.Devmode = false;
+                            else
+                            {
+                                writer.Log(LogType.Error, "wrong arguments");
+                                return;
+                            }
+                            writer.EditConfig("devmode = " + writer.Devmode);
+                            break;
+                        case "notification":
+                            if (tokens[2] == "true" || tokens[2] == "yes" || tokens[2] == "1")
+                                reminderMgr.FileMgr.Notification = true;
+                            else if (tokens[2] == "false" || tokens[2] == "no" || tokens[2] == "0")
+                                reminderMgr.FileMgr.Notification = false;
+                            else
+                            {
+                                writer.Log(LogType.Error, "wrong arguments");
+                                return;
+                            }
+                            writer.EditConfig("notification = " + reminderMgr.FileMgr.Notification);
+                            break;
+                        case "quickedit":
+                        case "quickEdit":
+                            if (tokens[2] == "true" || tokens[2] == "yes" || tokens[2] == "1")
+                                reminderMgr.FileMgr.Quickedit = true;
+                            else if (tokens[2] == "false" || tokens[2] == "no" || tokens[2] == "0")
+                                reminderMgr.FileMgr.Quickedit = false;
+                            else
+                            {
+                                writer.Log(LogType.Error, "wrong arguments");
+                                return;
+                            }
+                            writer.EditConfig("quickedit = " + reminderMgr.FileMgr.Quickedit);
+                            break;
                         default:
                             writer.Log(LogType.Error, "wrong arguments");
                             return;

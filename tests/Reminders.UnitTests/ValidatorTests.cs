@@ -95,8 +95,8 @@ namespace Reminders.UnitTests
         public void IsTimespanValid_StandardBehaviour()
         {
             bool be = true;
-            int ie = 10;
-            int ie6 = 0;
+            //int ie = 10;
+            //int ie6 = 0;
             bool ba = Validator.IsTimespanValid("10min"/*, out int ia*/);
             bool ba1 = Validator.IsTimespanValid("10h"/*, out int ia1*/);
             bool ba2 = Validator.IsTimespanValid("10d"/*, out int ia2*/);
@@ -126,8 +126,8 @@ namespace Reminders.UnitTests
         public void IsTimespanValid_ShortParam_StandardBehaviour()
         {
             bool be = true;
-            int ie = 10;
-            int ie6 = 0;
+            //int ie = 10;
+            //int ie6 = 0;
             bool ba = Validator.IsTimespanValid("10minute"/*, out int ia*/);
             bool ba1 = Validator.IsTimespanValid("10hour"/*, out int ia1*/);
             bool ba2 = Validator.IsTimespanValid("10day"/*, out int ia2*/);
