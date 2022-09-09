@@ -38,7 +38,7 @@ namespace Reminders
             Init();
         }
 
-        private void Init()
+        public void Init()
         {
             if (fileMgr.Reminders == null)
             {

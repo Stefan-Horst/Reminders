@@ -128,13 +128,17 @@ namespace Reminders
                             " - exit");
         }
         
-        public void ShowConfig(string path, bool autostart, int time)
+        public void ShowConfig(string path, bool autostart, int time, bool notification, bool quickedit)
         {
             simio.WriteLine(" Configurable parameters and their current values:" + Environment.NewLine +
                             "\tpath = " + path + Environment.NewLine +
                             "\tautostart = " + autostart + Environment.NewLine +
                             "\tupcomingRemindersTime = " + time + " (in days)" + Environment.NewLine +
-                            " (You can also change these values in the config.txt file, but a restart of this program will be needed for them to take effect)");
+                            "\tdevMode = " + devmode + Environment.NewLine +
+                            "\tnotification = " + notification + Environment.NewLine +
+                            "\tquickEdit = " + quickedit + Environment.NewLine +
+                            " (You can also change these values in the config.txt file. " + Environment.NewLine +
+                            "  A restart of this program will be needed for some of them to take effect)");
         }
 
         public void EditConfig(string value)
@@ -290,6 +294,14 @@ namespace Reminders
             {
                 return output + content;
             }*/
+        }
+
+        public void FileChange(string oldPath, string newPath)
+        {
+            simio.WriteLine(" FILE CHANGE: you have changed the data file. " + Environment.NewLine +
+                            " Your reminders have been saved, new reminders have been loaded." + Environment.NewLine +
+                            " Old path: " + oldPath + Environment.NewLine +
+                            " New path: " + newPath);
         }
     }
 }

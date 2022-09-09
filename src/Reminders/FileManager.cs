@@ -22,8 +22,8 @@ namespace Reminders
 
         private OutputTextWriter writer;
 
-        private readonly string appPath = AppDomain.CurrentDomain.BaseDirectory;
-        private string dataPath;
+        private readonly string appPath = AppDomain.CurrentDomain.BaseDirectory; // config.txt is always saved here
+        private string dataPath; // path where data.rmdr is saved
         private string dataFilename = "data.rmdr";
         private int upcomingDays;
         private bool autostart;
@@ -54,7 +54,7 @@ namespace Reminders
             {
                 writer.Log(LogType.Error, "loading data failed");
 
-                if (! File.Exists(dataPath + ConfigFile))
+                if (! File.Exists(appPath + dataFilename))
                 {
                     if (! SaveData()) // creates new empty data file
                         writer.Log(LogType.ErrorCritical, "creating data file failed");
@@ -74,7 +74,7 @@ namespace Reminders
         {
             // structure of config file: parameter=value;[newline]... (= and ; characters not used in names or values)
 
-            if (! LoadFile(dataPath, ConfigFile, out string fileRaw))
+            if (! LoadFile(appPath, ConfigFile, out string fileRaw))
             {
                 writer.Log(LogType.Error, "loading config file failed");
                 return false;
@@ -116,9 +116,9 @@ namespace Reminders
             bool error = false;
             
             // param: devmode; allowed values: "true" or "false"
-            if (values[3] == "true")
+            if (values[3] == "true" || values[3] == "True")
                 writer.Devmode = true;
-            else if (values[3] == "false")
+            else if (values[3] == "false" || values[3] == "False")
                 writer.Devmode = false;
             else
             {
@@ -126,7 +126,7 @@ namespace Reminders
                 error = true;
             }
 
-            writer.Log(LogType.Info, "data file loaded successfully: " + ConfigFile); // first info log only possible after devmode init
+            writer.Log(LogType.Info, "file loaded successfully: " + ConfigFile); // first info log only possible after devmode init
             writer.Log(LogType.Info, "devmode: " + writer.Devmode);
             
             // param: path; allowed values: "default" or any file path
@@ -138,28 +138,33 @@ namespace Reminders
             writer.Log(LogType.Info, "datapath: " + dataPath);
 
             // param: autostart; allowed values: "true" or "false"
-            if (values[1] == "true")
+            if (values[1] == "true" || values[1] == "True")
             {   //add to autostart
                 autostart = true;
 
                 string startupDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
 
-                ShortcutCreator shortcutCreator = new ShortcutCreator();
-                shortcutCreator.CreateShortcut(startupDir, AutostartFilename);
-
-                if (!File.Exists(startupDir))
+                if (! File.Exists(Path.Combine(startupDir, AutostartFilename + ".lnk")))
                 {
-                    writer.Log(LogType.Error, "delete autostart shortcut failed"); 
-                    error = true;
+                    ShortcutCreator shortcutCreator = new ShortcutCreator();
+                    shortcutCreator.CreateShortcut(startupDir, AutostartFilename);
+    
+                    if (! File.Exists(Path.Combine(startupDir, AutostartFilename + ".lnk")))
+                    {
+                        writer.Log(LogType.Error, "creating autostart shortcut failed"); 
+                        error = true;
+                    }
+                    else
+                        writer.Log(LogType.Info, "autostart shortcut created: " + startupDir + "\\" + AutostartFilename + ".lnk");
                 }
                 else
-                    writer.Log(LogType.Info, "autostart shortcut created: " + startupDir + "\\" + AutostartFilename + ".lnk");
+                    writer.Log(LogType.Info, "autostart shortcut already exists");
             }
-            else if (values[1] == "false")
+            else if (values[1] == "false" || values[1] == "False")
             {   //remove from autostart
                 autostart = false;
 
-                string shortcutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "Reminder.lnk");
+                string shortcutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), AutostartFilename + ".lnk");
 
                 if (File.Exists(shortcutPath))
                 { 
@@ -167,10 +172,13 @@ namespace Reminders
 
                     if (File.Exists(shortcutPath))
                     { 
-                        writer.Log(LogType.Error, "delete autostart shortcut failed");
+                        writer.Log(LogType.Error, "deleting autostart shortcut failed");
                         error = true;
                     }
+                    writer.Log(LogType.Info, "autostart shortcut deleted");
                 }
+                else
+                    writer.Log(LogType.Info, "autostart shortcut does not exist");
             }
             else
             {
@@ -194,9 +202,9 @@ namespace Reminders
             writer.Log(LogType.Info, "upcomingDays: " + upcomingDays);
             
             // param: notification; allowed values: "true" or "false"
-            if (values[4] == "true")
+            if (values[4] == "true" || values[4] == "True")
                 notification = true;
-            else if (values[4] == "false")
+            else if (values[4] == "false" || values[4] == "False")
                 notification = false;
             else
             {
@@ -207,9 +215,9 @@ namespace Reminders
             writer.Log(LogType.Info, "notification: " + notification);
 
             // param: quickedit; allowed values: "true" or "false"
-            if (values[5] == "true")
+            if (values[5] == "true" || values[5] == "True")
                 quickedit = true;
-            else if (values[5] == "false")
+            else if (values[5] == "false" || values[5] == "False")
                 quickedit = false;
             else
             {
@@ -241,11 +249,11 @@ namespace Reminders
                                 "upcomingreminderstime=" + upcomingDays + ";\n" +
                                 "devmode=" + writer.Devmode + ";\n" + 
                                 "notification=" + notification + ";\n" +
-                                "quickedit=" + quickedit + ";\n";
+                                "quickedit=" + quickedit + ";";
             
             ApplyConfig(new string[] {dataPath, "" + autostart, "" + upcomingDays, "" + writer.Devmode, "" + notification, "" + quickedit});
 
-            if (! SaveFile(dataPath, ConfigFile, configText))
+            if (! SaveFile(appPath, ConfigFile, configText))
                 writer.Log(LogType.Error, "saving config failed");
             else
                 writer.Log(LogType.Info, "file saved successfully: " + ConfigFile);
@@ -417,10 +425,28 @@ namespace Reminders
             {
                 if (value != dataPath)
                 {
-                    dataPath = value;
-                    
-                    if (! SaveData())
+                    if (!SaveData())
+                    {
                         writer.Log(LogType.Error, "saving data failed");
+                        return;
+                    }
+
+                    string oldPath = dataPath;
+                    
+                    if (value == "default")
+                        dataPath = appPath;
+                    else
+                        dataPath = value;
+                    
+                    SaveConfig();
+
+                    reminders = Array.Empty<Reminder>();
+                    Init(); // load data from new file or create new data file if none exists
+
+                    writer.FileChange(oldPath, dataPath);
+
+                    //if (! LoadData())
+                    //    writer.Log(LogType.Error, "loading data failed");
                 }
             }
         }

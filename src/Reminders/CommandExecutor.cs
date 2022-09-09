@@ -590,7 +590,7 @@ namespace Reminders
             {
                 if (tokens.Length == 1)
                 {
-                    writer.ShowConfig(reminderMgr.FileMgr.DataPath, reminderMgr.FileMgr.Autostart, reminderMgr.FileMgr.UpcomingDays);
+                    writer.ShowConfig(reminderMgr.FileMgr.DataPath, reminderMgr.FileMgr.Autostart, reminderMgr.FileMgr.UpcomingDays, reminderMgr.FileMgr.Notification, reminderMgr.FileMgr.Quickedit);
                 }
                 else if (tokens.Length == 2 && tokens[1] == "reset")
                 {
@@ -605,7 +605,11 @@ namespace Reminders
                     {
                         case "path":
                             reminderMgr.FileMgr.DataPath = tokens[2];
-                            writer.EditConfig("path = " + tokens[2]);
+                            if (tokens[2] == "default")
+                                writer.EditConfig("path = " + reminderMgr.FileMgr.DataPath);
+                            else
+                                writer.EditConfig("path = " + tokens[2]);
+                            reminderMgr.Init();
                             break;
                         case "autostart":
                             if (tokens[2] == "true" || tokens[2] == "yes" || tokens[2] == "1")
@@ -643,6 +647,7 @@ namespace Reminders
                                 return;
                             }
                             writer.EditConfig("devmode = " + writer.Devmode);
+                            reminderMgr.FileMgr.SaveConfig();
                             break;
                         case "notification":
                             if (tokens[2] == "true" || tokens[2] == "yes" || tokens[2] == "1")
@@ -673,7 +678,6 @@ namespace Reminders
                             writer.Log(LogType.Error, "wrong arguments");
                             return;
                     }
-                    reminderMgr.FileMgr.SaveConfig();
                 }
                 else
                 {
