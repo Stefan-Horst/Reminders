@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Reminders.ConsoleIO;
@@ -18,13 +19,22 @@ namespace Reminders.UnitTests
         [TestInitialize]
         public void Initialize()
         {
-            //clear file for clean test environment
-            File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data.rmdr"), "", Encoding.Unicode);
-
             //OutputTextWriter will not be used, but is mandatory arg
             OutputTextWriter otw = new OutputTextWriter(new SimulConsoleIO(new OutputWriter()));
             rm = new ReminderManager(otw);
             ce = new CommandExecutor(otw, rm);
+            
+            // clear filemanager for clean test environment and create new file for tests
+            File.WriteAllText(Path.Combine(rm.FileMgr.DataPath, "dataTest.rmdr"), "", Encoding.Unicode);
+            rm.FileMgr.Filename = "dataTest.rmdr";
+            rm.Reminders = new List<Reminder>();
+        }
+        
+        [TestCleanup]
+        public void Cleanup()
+        {
+            // remove file created for tests
+            File.Delete(Path.Combine(rm.FileMgr.DataPath, "dataTest.rmdr"));
         }
 
         [TestMethod]

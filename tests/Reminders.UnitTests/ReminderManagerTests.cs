@@ -25,21 +25,21 @@ namespace Reminders.UnitTests
         [TestInitialize]
         public void Initialize()
         {
-            //clear file for clean test environment
-            //D:\Stefan\Programmieren\VisualStudioProjects\Reminders\Reminders.UnitTests\bin\Debug\netcoreapp3.1\data.rmdr
-            File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data.rmdr"), "", Encoding.Unicode);
-
             rm = new ReminderManager(new OutputTextWriter(new SimulConsoleIO(new OutputWriter()))); //OutputTextWriter will not be used, but is mandatory arg
+            
+            // clear filemanager for clean test environment and create new file for tests
+            File.WriteAllText(Path.Combine(rm.FileMgr.DataPath, "dataTest.rmdr"), "", Encoding.Unicode);
+            rm.FileMgr.Filename = "dataTest.rmdr";
+            rm.Reminders = new List<Reminder>();
         }
 
-        //[TestMethod]
-        //public void Test()
-        //{
-        //    Assert.AreEqual(@"D:\Stefan\Programmieren\VisualStudioProjects\Reminders\Reminders\bin\Debug\netcoreapp3.1\", AppDomain.CurrentDomain.BaseDirectory);
-        //}
-
-        //method naming scheme: [referenced method]_[aspect tested]_[expected result]
-
+        [TestCleanup]
+        public void Cleanup()
+        {
+            // remove file created for tests
+            File.Delete(Path.Combine(rm.FileMgr.DataPath, "dataTest.rmdr"));
+        }
+        
         [TestMethod]
         public void CreateReminder_StandardBehaviour()
         {
@@ -53,9 +53,36 @@ namespace Reminders.UnitTests
         {
             int id = rm.CreateReminder(TEST_DATE4, "0", "reminder 1");
             Reminder expected = new Reminder(TEST_DATE4, "0", "reminder 1");
+            expected.Id = id;
 
             Reminder r = rm.ReadReminder(id);
-            r.Id = -1; //id is irrelevant for test and would fail it otherwise, because the value can change
+            string se = JsonConvert.SerializeObject(expected);
+            string sa = JsonConvert.SerializeObject(r);
+
+            Assert.AreEqual(se, sa);
+        }
+        
+        [TestMethod]
+        public void DeleteReminder_StandardBehaviour()
+        {
+            int id = rm.CreateReminder(TEST_DATE4, "0", "reminder 1");
+            rm.DeleteReminder(id);
+
+            int ie = 0;
+            int ia = rm.Reminders.Count;
+            
+            Assert.AreEqual(ie, ia);
+        }
+        
+        [TestMethod]
+        public void UpdateReminder_StandardBehaviour()
+        {
+            int id = rm.CreateReminder(TEST_DATE4, "0", "reminder 1");
+            Reminder expected = new Reminder(TEST_DATE3, "1", "reminder 2");
+            expected.Id = id;
+
+            rm.UpdateReminder(id, new Reminder(TEST_DATE3, "1", "reminder 2"));
+            Reminder r = rm.ReadReminder(id);
             string se = JsonConvert.SerializeObject(expected);
             string sa = JsonConvert.SerializeObject(r);
 
