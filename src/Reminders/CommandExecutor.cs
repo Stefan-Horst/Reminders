@@ -41,8 +41,10 @@ namespace Reminders
                     writer.ShowCommands();
                     break;
 
-                case "read": // show details of reminder e.g. complete content
+                case "read": // mark reminder as read
                 case "r":
+                case "unread":
+                case "ur":
                     CmdRead();
                     break;
 
@@ -97,17 +99,25 @@ namespace Reminders
             }
         }
 
-        //command: read id
-        //command structure: read[/r] {id}
-        private void CmdRead() // show one reminder in full detail
+        //command: un/read id
+        //command structure: [un]read[/[u/]r] {id}
+        private void CmdRead() // mark reminder as read or unread
         {
             try
             {
-                bool b = int.TryParse(tokens[1], out int id);
-
-                if (!b)
+                if (! int.TryParse(tokens[1], out int id))
                 {
-                    writer.Log(LogType.Error, "wrong id format");
+                    writer.Log(LogType.Error, "wrong arguments");
+                    return;
+                }
+                
+                if (tokens[0] == "read" || tokens[0] == "r")
+                    reminderMgr.MarkReminder(id, true);
+                else if (tokens[0] == "unread" || tokens[0] == "ur")
+                    reminderMgr.MarkReminder(id, false);
+                else
+                {
+                    writer.Log(LogType.Error, "wrong arguments");
                     return;
                 }
 
@@ -115,18 +125,28 @@ namespace Reminders
             }
             catch (Exception ex)
             {
-                writer.Log(LogType.Error, "reading reminder failed");
+                writer.Log(LogType.Error, "marking reminder as (un)read failed");
                 writer.Log(LogType.ErrorEx, ex.Message);
             }
         }
 
-        //command: create date time repeat content
-        //command structure: create[/c] {dd(.)mm(.)(yy)yy} ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) {text}
+        //command: create date/timespan time repeat content
+        //command structure: create[/c] {dd(.)mm(.)(yy)yy[/{x}min[/h/d/m/y]]} ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) {text}
         private void CmdCreate()
         {
             try
             {
-                if (! validator.IsDateValid(tokens[1], out string date))
+                string date;
+                
+                if (Validator.IsTimespanValid(tokens[1]))
+                {
+                    ConverterFormatter.StandardizeTimespan(tokens[1], out int amount, out string unit);
+
+                    DateTime dt = ConverterFormatter.AddTimespanToDateTime(amount, unit, DateTime.Now, true);
+
+                    date = dt.ToString("ddMMyyyyHHmm");
+                }
+                else if (! validator.IsDateValid(tokens[1], out date))
                 {
                     writer.Log(LogType.Error, "wrong date argument");
                     return;
@@ -376,8 +396,8 @@ namespace Reminders
             }
         }
 
-        //command: show unread startdate enddate / date / last timespan
-        //command structure: show[/s] ([un]read[/[u/]r]) (s{dd(.)mm(.)(yy)yy)}) (e{dd(.)mm(.)(yy)yy)})  /  show[/s] ([un]read[/[u/]r]) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]/yesterday[/ye](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]
+        //command: show unread startdate enddate / date / last timespan / id
+        //command structure: show[/s] ([un]read[/[u/]r]) (s{dd(.)mm(.)(yy)yy)}) (e{dd(.)mm(.)(yy)yy)})  /  show[/s] ([un]read[/[u/]r]) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]/yesterday[/ye](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]  /  show[/s] {id}
         private void CmdShow()
         {
             // show full text or only preview in list when multiple reminders are shown?
@@ -431,6 +451,11 @@ namespace Reminders
                         else
                             writer.PrintRemindersList(reminderMgr.GetRemindersDueOnDate(ConverterFormatter.ConvertStringToDate(date1)).FindAll(r => r.Read == Convert.ToBoolean(read)));
 
+                        return;
+                    }
+                    if (int.TryParse(s, out int id))
+                    {
+                        writer.ShowReminder(reminderMgr.ReadReminder(id));
                         return;
                     }
                     if (s == "today" || s == "t")
