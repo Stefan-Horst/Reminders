@@ -108,21 +108,32 @@ namespace Reminders
         public void ShowHelp()
         {
             simio.WriteLine(" Use the console to create, modify and delete reminders.");
-            simio.WriteLine(" Type \"commands\" for a detailed list of commands you can use");
+            simio.WriteLine(" The following commands are available:" + Environment.NewLine +
+                            " \tcreate \tdate time timespan content" + Environment.NewLine +
+                            " \tdelete \tid" + Environment.NewLine +
+                            " \tupdate \tid date time timespan content" + Environment.NewLine +
+                            " \tedit \tid" + Environment.NewLine +
+                            " \tread \tid" + Environment.NewLine +
+                            " \tshow \tid / status startdate enddate / date / timespan" + Environment.NewLine +
+                            " \tsearch \tterms" + Environment.NewLine +
+                            " \tconfig \tsetting / reset" + Environment.NewLine +
+                            " \texit");
+            simio.WriteLine(" Type \"commands\" for a detailed list of commands and their options and parameters");
         }
 
         public void ShowCommands()
         {
             simio.WriteLine(" A list of all commands including abbreviations and with parameters:" + Environment.NewLine +
-                            " - read[/r] {id}" + Environment.NewLine +
                             " - create[/c] {dd(.)mm(.)(yy)yy} ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) {text}" + Environment.NewLine +
                             " - delete[/del/d] {id}" + Environment.NewLine +
                             " - update[/u] {id} ({dd(.)mm(.)(yy)yy}) ({hh(:[/.])mm}) ({x}min[/h/d/m/y]) ({text})" + Environment.NewLine +
                             " - edit[/e] {id}" + Environment.NewLine +
-                            " - search[/se] {term} (\"{term2..n}\")" + Environment.NewLine +
-                            " - show[/s] ([un]read[/[u/]r]) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]/yesterday[/ye](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]" + Environment.NewLine +
+                            " - read[/r] {id}" + Environment.NewLine +
+                            " - show[/s] ([un]read[/[u/]r]) {dd(.)mm(.)(yy)yy)}[/today[/t]/tomorrow[/to]" + Environment.NewLine +
+                            "            /yesterday[/ye](last[/l])/week[/w]/month[/m]/year[/y]/{x}d/{x}w/{x}y/]" + Environment.NewLine +
                             "\tshow[/s] ([un]read[/[u/]r]) (s{dd(.)mm(.)(yy)yy)}) (e{dd(.)mm(.)(yy)yy)})" + Environment.NewLine +
                             "\tshow[/s] {id}" + Environment.NewLine +
+                            " - search[/se] {term} (\"{term2..n}\")" + Environment.NewLine +
                             " - config[/co/settings] {parameter} {value}" + Environment.NewLine +
                             "\tconfig[/co/settings] reset" + Environment.NewLine +
                             " - exit");
@@ -236,8 +247,9 @@ namespace Reminders
                 string content = "";
                 foreach (Reminder r in rmdrs)
                 {
+                    string read = r.Read == true ? "yes," : "no, ";
                     // equal formatting for every reminder
-                    string s = ReminderStartText + "Id: " + r.Id + new string(' ', maxIdLength - r.Id.ToString().Length) + ", " + r.Date.ToShortDateString() + " " + r.Date.ToShortTimeString() + ", Repeat: " + r.Repeat + "," + new string(' ', maxRepeatLength - r.Repeat.Length) + " Content: " + r.Content;
+                    string s = ReminderStartText + "Id: " + r.Id + new string(' ', maxIdLength - r.Id.ToString().Length) + ", " + r.Date.ToShortDateString() + " " + r.Date.ToShortTimeString() + ", Rpt: " + r.Repeat + "," + new string(' ', maxRepeatLength - r.Repeat.Length) + " Rd: " + read + " Cnt: " + r.Content;
 
                     if (reminderStartTotalLength + content.Length > Console.BufferWidth && !(reminderStartTotalLength + content.Length - r.Content.Length > Console.BufferWidth))
                     {
@@ -258,7 +270,8 @@ namespace Reminders
         
         private string PrintReminder(Reminder r)
         {
-            string output = ReminderStartText + "Id: " + r.Id + ", Date: " + r.Date.ToShortDateString() + " " + r.Date.ToShortTimeString() + ", Repeat: " + r.Repeat + Environment.NewLine;
+            string read = r.Read == true ? "yes" : "no";
+            string output = ReminderStartText + "Id: " + r.Id + ", Date: " + r.Date.ToShortDateString() + " " + r.Date.ToShortTimeString() + ", Repeat: " + r.Repeat + ", Read: " + read + Environment.NewLine;
             
             /*if (ReminderStartText.Length + s.Length + r.Content.Length > Console.BufferWidth && !(ReminderStartText.Length + s.Length - r.Content.Length > Console.BufferWidth))
             {
