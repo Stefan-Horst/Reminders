@@ -217,7 +217,7 @@ namespace Reminders
             string s = ListReminders(rmdrs);
             
             if (s != "")
-                simio.WriteLine(s);
+                simio.Write(s);
         }
         
         private string ListReminders(List<Reminder> rmdrs)
@@ -237,7 +237,7 @@ namespace Reminders
 
                     if (reminderStartTotalLength + content.Length > Console.BufferWidth && !(reminderStartTotalLength + content.Length - r.Content.Length > Console.BufferWidth))
                     {
-                        s = s.Remove(Console.BufferWidth - reminderStartTotalLength - 4); // trim content so that each reminder is not longer than one line in console
+                        s = s.Remove(Console.BufferWidth - reminderStartTotalLength - 1); // trim content so that each reminder is not longer than one line in console
 
                         //if (ReminderStartText.Contains("\t"))
                         //    s = s.Remove(s.Length - TabLength);

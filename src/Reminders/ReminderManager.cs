@@ -121,22 +121,30 @@ namespace Reminders
         // handles due reminders and generates output for textprovider
         public string GetDueRemindersOutput()
         {
-            List<Reminder> rmdrs = GetDueReminders(DateTime.Now);
-            rmdrs.RemoveAll(r => shownReminders.Contains(r.Id)); // remove reminders that have already been shown
-
-            if (rmdrs.Count > 0)
+            try
             {
-                shownReminders.AddRange(rmdrs.Select(r => r.Id).ToList());
-                
-                foreach (int id in shownReminders)
-                {
-                    if(ReadReminder(id).Read == true)
-                        SetReminderToNextDate(id);
-                }
-                
-                fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
+                List<Reminder> rmdrs = GetDueReminders(DateTime.Now);
+                rmdrs.RemoveAll(r => shownReminders.Contains(r.Id)); // remove reminders that have already been shown
 
-                return writer.DueReminders(rmdrs);
+                if (rmdrs.Count > 0)
+                {
+                    shownReminders.AddRange(rmdrs.Select(r => r.Id).ToList());
+                    
+                    foreach (int id in shownReminders)
+                    {
+                        if(ReadReminder(id).Read == true)
+                            SetReminderToNextDate(id);
+                    }
+                    
+                    fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
+
+                    return writer.DueReminders(rmdrs);
+                }
+            }
+            catch (Exception ex)
+            {
+                writer.Log(LogType.Error, "Getting due reminder(s) failed");
+                writer.Log(LogType.ErrorEx, ex.Message);
             }
             
             return "";
@@ -238,12 +246,10 @@ namespace Reminders
             {
                 reminders.RemoveAt(i);
                 fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
-                //return true;
             }
             else
             {
                 writer.Log(LogType.Error, "deleting reminder failed");
-                //return false;
                 throw new InvalidOperationException("No Reminder with ID " + id + " found.");
             }
         }
@@ -254,14 +260,13 @@ namespace Reminders
 
             if (i != -1) //value equals -1 if no index found
             {
+                reminder.Id = id;
                 reminders[i] = reminder;
                 fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
-                //return true;
             }
             else
             {
                 writer.Log(LogType.Error, "updating reminder failed");
-                //return false;
                 throw new InvalidOperationException("No Reminder with ID " + id + " found.");
             }
         }

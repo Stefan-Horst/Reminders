@@ -246,8 +246,9 @@ namespace Reminders
                     return;
                 }
 
-                writer.DeleteReminder(reminderMgr.ReadReminder(id));
+                Reminder r = reminderMgr.ReadReminder(id);
                 reminderMgr.DeleteReminder(id);
+                writer.DeleteReminder(r);
             }
             catch (Exception ex)
             {
@@ -264,6 +265,7 @@ namespace Reminders
             {
                 Reminder r = reminderMgr.ReadReminder(int.Parse(tokens[1]));
                 Reminder rClone = new Reminder(r.DateString, r.Repeat, r.Read, r.Content);
+                rClone.Id = r.Id;
 
                 for (int i = 2; i < tokens.Length; i++)
                 {
@@ -298,6 +300,8 @@ namespace Reminders
                         writer.UpdateReminder(rClone, r);
                         return;
                     }
+                    reminderMgr.UpdateReminder(r.Id, r);
+                    
                     writer.UpdateReminder(rClone, r);
                 }
             }
@@ -324,6 +328,8 @@ namespace Reminders
                 Reminder rClone = new Reminder(r.DateString, r.Repeat, r.Read, r.Content);
                 rClone.Id = r.Id;
                 r.Content = writer.EditReminder(r.Content);
+                
+                reminderMgr.UpdateReminder(r.Id, r);
 
                 writer.UpdateReminder(rClone , r);
             }

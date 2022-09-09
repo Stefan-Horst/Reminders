@@ -384,7 +384,7 @@ namespace Reminders
                 {
                     dataPath = value;
                     
-                    if (SaveData())
+                    if (! SaveData())
                         writer.Log(LogType.Error, "saving data failed");
                 }
             }
@@ -399,7 +399,7 @@ namespace Reminders
                 {
                     reminders = value;
                     
-                    if (SaveData())
+                    if (! SaveData())
                         writer.Log(LogType.Error, "saving data failed");
                 }
             }
