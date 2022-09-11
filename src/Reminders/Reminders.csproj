@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <StartupObject>Reminders.Program</StartupObject>
+    <ApplicationIcon>reminders.ico</ApplicationIcon>
   </PropertyGroup>
 
 	<ItemGroup>
