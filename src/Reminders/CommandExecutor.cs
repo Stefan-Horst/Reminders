@@ -545,9 +545,9 @@ namespace Reminders
                             reminderMgr.Init();
                             break;
                         case "autostart":
-                            if (tokens[2] == "true" || tokens[2] == "yes" || tokens[2] == "1")
+                            if (Validator.StringEqualsTrue(tokens[2]))
                                 reminderMgr.FileMgr.Autostart = true;
-                            else if (tokens[2] == "false" || tokens[2] == "no" || tokens[2] == "0")
+                            else if (Validator.StringEqualsFalse(tokens[2]))
                                 reminderMgr.FileMgr.Autostart = false;
                             else
                             {
@@ -570,9 +570,9 @@ namespace Reminders
                             break;
                         case "devmode":
                         case "devMode":
-                            if (tokens[2] == "true" || tokens[2] == "yes" || tokens[2] == "1")
+                            if (Validator.StringEqualsTrue(tokens[2]))
                                 writer.Devmode = true;
-                            else if (tokens[2] == "false" || tokens[2] == "no" || tokens[2] == "0")
+                            else if (Validator.StringEqualsFalse(tokens[2]))
                                 writer.Devmode = false;
                             else
                             {
@@ -583,9 +583,9 @@ namespace Reminders
                             reminderMgr.FileMgr.SaveConfig();
                             break;
                         case "notification":
-                            if (tokens[2] == "true" || tokens[2] == "yes" || tokens[2] == "1")
+                            if (Validator.StringEqualsTrue(tokens[2]))
                                 reminderMgr.FileMgr.Notification = true;
-                            else if (tokens[2] == "false" || tokens[2] == "no" || tokens[2] == "0")
+                            else if (Validator.StringEqualsFalse(tokens[2]))
                                 reminderMgr.FileMgr.Notification = false;
                             else
                             {
@@ -596,9 +596,9 @@ namespace Reminders
                             break;
                         case "quickedit":
                         case "quickEdit":
-                            if (tokens[2] == "true" || tokens[2] == "yes" || tokens[2] == "1")
+                            if (Validator.StringEqualsTrue(tokens[2]))
                                 reminderMgr.FileMgr.Quickedit = true;
-                            else if (tokens[2] == "false" || tokens[2] == "no" || tokens[2] == "0")
+                            else if (Validator.StringEqualsFalse(tokens[2]))
                                 reminderMgr.FileMgr.Quickedit = false;
                             else
                             {

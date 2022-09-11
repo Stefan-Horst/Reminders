@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using Reminders.util;
 using Reminders.WinApi;
 
 namespace Reminders
@@ -116,9 +117,9 @@ namespace Reminders
             bool error = false;
             
             // param: devmode; allowed values: "true" or "false"
-            if (values[3] == "true" || values[3] == "True")
+            if (Validator.StringEqualsTrue(values[3]))
                 writer.Devmode = true;
-            else if (values[3] == "false" || values[3] == "False")
+            else if (Validator.StringEqualsFalse(values[3]))
                 writer.Devmode = false;
             else
             {
@@ -130,7 +131,7 @@ namespace Reminders
             writer.Log(LogType.Info, "devmode: " + writer.Devmode);
             
             // param: path; allowed values: "default" or any file path
-            if (values[0] == "default") //path of application
+            if (values[0] == "default" || values[0] == "Default") //path of application
                 dataPath = appPath;
             else
                 dataPath = values[0];
@@ -138,7 +139,7 @@ namespace Reminders
             writer.Log(LogType.Info, "datapath: " + dataPath);
 
             // param: autostart; allowed values: "true" or "false"
-            if (values[1] == "true" || values[1] == "True")
+            if (Validator.StringEqualsTrue(values[1]))
             {   //add to autostart
                 autostart = true;
 
@@ -159,7 +160,7 @@ namespace Reminders
                 else
                     writer.Log(LogType.Info, "autostart shortcut already exists");
             }
-            else if (values[1] == "false" || values[1] == "False")
+            else if (Validator.StringEqualsFalse(values[1]))
             {   //remove from autostart
                 autostart = false;
 
@@ -201,9 +202,9 @@ namespace Reminders
             writer.Log(LogType.Info, "upcomingDays: " + upcomingDays);
             
             // param: notification; allowed values: "true" or "false"
-            if (values[4] == "true" || values[4] == "True")
+            if (Validator.StringEqualsTrue(values[4]))
                 notification = true;
-            else if (values[4] == "false" || values[4] == "False")
+            else if (Validator.StringEqualsFalse(values[4]))
                 notification = false;
             else
             {
@@ -214,9 +215,9 @@ namespace Reminders
             writer.Log(LogType.Info, "notification: " + notification);
 
             // param: quickedit; allowed values: "true" or "false"
-            if (values[5] == "true" || values[5] == "True")
+            if (Validator.StringEqualsTrue(values[5]))
                 quickedit = true;
-            else if (values[5] == "false" || values[5] == "False")
+            else if (Validator.StringEqualsFalse(values[5]))
                 quickedit = false;
             else
             {

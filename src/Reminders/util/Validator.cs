@@ -102,5 +102,15 @@ namespace Reminders.util
                 return false;
             }
         }
+
+        public static bool StringEqualsTrue(string text)
+        {
+            return text == "true" || text == "True" || text == "yes" || text == "1";
+        }
+        
+        public static bool StringEqualsFalse(string text)
+        {
+            return text == "false" || text == "False" || text == "yes" || text == "0";
+        }
     }
 }
