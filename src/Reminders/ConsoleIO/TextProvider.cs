@@ -20,7 +20,6 @@ namespace Reminders.ConsoleIO
 
         public void CheckForText()
         {
-            //reminderManager.GetDueReminders(DateTime.Now).ForEach(i => outputWriter.AddText(i.ToString()));
             string output = reminderManager.GetDueRemindersOutput();
             if (output != "")
                 outputWriter.AddText(output + Environment.NewLine);

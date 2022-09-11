@@ -7,7 +7,6 @@ using Reminders.util;
 namespace Reminders
 {
     //taking the commands from the cmd and delegating logic to remindermanager and output to outputtextwriter
-    // problem: remindermanager has some standalone tasks like the welcome message at program start, should it be called from here (not fitting) or separately from main
     public class CommandExecutor
     {
         private OutputTextWriter writer;
@@ -16,9 +15,7 @@ namespace Reminders
         private string[] tokens; //current user input tokenized
 
         private Validator validator = new Validator();
-
-        // todo cache reminders from last show etc command with easier access ids
-
+        
         public CommandExecutor(OutputTextWriter outputTextWriter, ReminderManager reminderManager)
         {
             writer = outputTextWriter;
@@ -160,7 +157,7 @@ namespace Reminders
                 else
                     time = "0000";
                 
-                if (Validator.IsTimespanValid(tokens[i]/*, out _*/))
+                if (Validator.IsTimespanValid(tokens[i]))
                 {
                     repeat = ConverterFormatter.StandardizeTimespan(tokens[i], out _, out _);
                     i++;
@@ -173,52 +170,7 @@ namespace Reminders
                 {
                     sb.Append(" " + tokens[j]);
                 }
-
-                /*if (tokens.Length == 5)
-                {
-                    if (! validator.IsTimeValid(tokens[2], out time))
-                    {
-                        writer.ShowError(0, "wrong time arg");
-                        return;
-                    }
-                    if (! validator.IsTimespanValid(tokens[3], out _))
-                    {
-                        writer.ShowError(0, "wrong date arg");
-                        return;
-                    }
-                    repeat = tokens[3];
-                    text = tokens[4];
-                }
-                else if (tokens.Length == 4)
-                {
-                    if (validator.IsTimeValid(tokens[2], out time))
-                    {
-                        repeat = "0";
-                    }
-                    else if (validator.IsTimespanValid(tokens[2], out _))
-                    {
-                        time = "0000";
-                        repeat = tokens[2];
-                    }
-                    else
-                    {
-                        writer.ShowError(0, "wrong time/timespan args");
-                        return;
-                    }
-                    text = tokens[3];
-                }
-                else if (tokens.Length == 3)
-                {
-                    time = "0000";
-                    repeat = "0";
-                    text = tokens[2];
-                }
-                else
-                {
-                    writer.ShowError(0, "missing args");
-                    return;
-                }*/
-                //if (IsDateValid(date, out string date1) && IsTimeValid(time, out string time1) && IsTimespanValid(repeat, out _))
+                
                 int id = reminderMgr.CreateReminder(date + time, repeat, sb.ToString());
                 
                 writer.CreateReminder(reminderMgr.ReadReminder(id));
@@ -229,9 +181,7 @@ namespace Reminders
                 writer.Log(LogType.ErrorEx, ex.Message);
             }
         }
-
-        //always keep last (list of) reminders with numbers (ids) cached so ids can be referenced in commands
-
+        
         //command: delete id
         //command structure: delete[/del/d] {id}
         private void CmdDelete()
@@ -269,10 +219,8 @@ namespace Reminders
 
                 for (int i = 2; i < tokens.Length; i++)
                 {
-                    string s = tokens[i]/*.Replace(".", "").Replace(":", "")*/;
-
-                    //if (int.TryParse(s, out _)) //maybe not needed
-                    //{
+                    string s = tokens[i];
+                    
                     if (validator.IsDateValid(s, out string date)) //date
                     {
                         r.DateString = date + r.Date.ToString("HHmm");
@@ -281,8 +229,7 @@ namespace Reminders
                     {
                         r.DateString = r.DateString.Remove(8) + time;
                     }
-                    //}
-                    else if (Validator.IsTimespanValid(s/*, out _*/)) //repeat
+                    else if (Validator.IsTimespanValid(s)) //repeat
                     {
                         r.Repeat = ConverterFormatter.StandardizeTimespan(s, out _, out _);
                     }
@@ -437,12 +384,12 @@ namespace Reminders
                         return;
                     }
 
-                    string s = tokens[i]/*.Replace(".", "")*/; //replace only necessary for dates
+                    string s = tokens[i]; //replace only necessary for dates
                     if (validator.IsDateValid(s, out string date1)) //startdate
                     {
                         if (tokens.Length > i + 1)
                         {
-                            string e = tokens[i + 1]/*.Replace(".", "")*/;
+                            string e = tokens[i + 1];
                             if (validator.IsDateValid(e, out string date2)) //enddate
                             {
                                 if (read == 2)
@@ -523,24 +470,8 @@ namespace Reminders
                         else
                             date = DateTime.Today.AddYears(1);
                     }
-                    else if (Validator.IsTimespanValid(tokens[i]/*, out int time) && time != 0*/)) //timespan
+                    else if (Validator.IsTimespanValid(tokens[i])) //timespan
                     {
-                        /*DateTime date = DateTime.Today.AddMinutes(-ConvertToMinutes(tokens[i], time));
-
-                        if (read == 2)
-                        {
-                            if (last)
-                                writer.ShowAllReminders(reminderMgr.GetRemindersDueInTimespan(date, DateTime.Today));
-                            else
-                                writer.ShowAllReminders(reminderMgr.GetRemindersDueInTimespan(DateTime.Today, date));
-                        }
-                        else
-                        {
-                            if (last)
-                                writer.ShowAllReminders(reminderMgr.GetRemindersDueInTimespan(date, DateTime.Today).FindAll(r => r.Read == Convert.ToBoolean(read)));
-                            else
-                                writer.ShowAllReminders(reminderMgr.GetRemindersDueInTimespan(DateTime.Today, date).FindAll(r => r.Read == Convert.ToBoolean(read)));
-                        }*/
                         ConverterFormatter.StandardizeTimespan(tokens[i], out int time, out _);
 
                         if (time != 0)
@@ -696,7 +627,7 @@ namespace Reminders
         //command: exit
         private void CmdExit()
         {
-            Environment.Exit(0); //cleanup or saving needed before?
+            Environment.Exit(0);
         }
     }
 }

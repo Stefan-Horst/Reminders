@@ -4,36 +4,6 @@ namespace Reminders.util
 {
     public class Validator
     {
-        /*private bool IsDateValid(string date)
-        {
-            try
-            {
-                int day = -1;
-                int month = -1;
-                int year = -1;
-
-                if (date.Length == 8)
-                {
-                    day = int.Parse(date[..2]);
-                    month = int.Parse(date.Substring(2, 2));
-                    year = int.Parse(date.Substring(4, 4));
-                }
-                else if (date.Length == 6)
-                {
-                    day = int.Parse(date[..2]);
-                    month = int.Parse(date.Substring(2, 2));
-                    year = int.Parse(DateTime.Now.Year.ToString().Remove(2) + date.Substring(4, 2));
-                }
-                DateTime dt = new DateTime(year, month, day);
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }*/
-
         // valid format: dd.mm.yyyy / ddmmyyyy / dd.mm.yy / ddmmyy
         public bool IsDateValid(string date, out string normalizedDate)
         {
@@ -65,29 +35,6 @@ namespace Reminders.util
                 return false;
             }
         }
-
-        /*private bool IsTimeValid(string time)
-        {
-            try
-            {
-                int hour = -1;
-                int minute = -1;
-
-                if (time.Length == 4)
-                {
-                    hour = int.Parse(time[..2]);
-                    minute = int.Parse(time.Substring(2, 2));
-
-                    if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 60)
-                        return true;
-                }
-                return false;
-            }
-            catch
-            {
-                return false;
-            }
-        }*/
 
         // valid format: hh:mm / hh.mm / h:mm / h.mm
         public bool IsTimeValid(string time, out string normalizedTime)
@@ -122,13 +69,10 @@ namespace Reminders.util
         }
 
         // valid format (x: any number): xminute[s] / xhour[s] / xday[s] / xweek[s] / xmonth[s] / xyear[s] / xmin[s] / xh / xd / xw / xm / xy
-        public static bool IsTimespanValid(string timespan/*, out int time*/) // also used for repeat
+        public static bool IsTimespanValid(string timespan) // also used for repeat
         {
-            //time = -1;
-
             if (timespan == "0")
             {
-                //time = 0;
                 return true;
             }
 
@@ -152,7 +96,6 @@ namespace Reminders.util
                 bool b = int.TryParse(timespan, out int t);
 
                 return b && t >= 0; // 0d, 0w, etc. are acceptable timespans which just result in 0
-                //time = t;
             }
             catch
             {

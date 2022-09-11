@@ -26,18 +26,6 @@ namespace Reminders
         public Reminder(string dateString, string repeat, string content)
             : this(dateString, repeat, false, content) { }
 
-        /*public void ConvertStringToDate()
-        {
-            //date format in string has to be DDMMYYYYhhmm
-            int day = int.Parse(dateString[..2]);
-            int month = int.Parse(dateString.Substring(2, 2));
-            int year = int.Parse(dateString.Substring(4, 4));
-            int hour = int.Parse(dateString.Substring(8, 2));
-            int minute = int.Parse(dateString.Substring(10, 2));
-
-            date = new DateTime(year, month, day, hour, minute, 0);
-        }*/
-
         private void ConvertDateToString()
         {
             dateString = date.ToString("ddMMyyyyHHmm");

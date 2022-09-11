@@ -146,8 +146,7 @@ namespace Reminders
 
                 if (! File.Exists(Path.Combine(startupDir, AutostartFilename + ".lnk")))
                 {
-                    ShortcutCreator shortcutCreator = new ShortcutCreator();
-                    shortcutCreator.CreateShortcut(startupDir, AutostartFilename);
+                    ShortcutCreator.CreateShortcut(startupDir, AutostartFilename);
     
                     if (! File.Exists(Path.Combine(startupDir, AutostartFilename + ".lnk")))
                     {
@@ -408,7 +407,7 @@ namespace Reminders
         public string Filename
         {
             get => dataFilename;
-            set // very late feature, absolutely not needed at beginning
+            set
             {
                 // users can enter filename without extension
                 if (!value.EndsWith(".rmdr"))
@@ -444,16 +443,13 @@ namespace Reminders
                     Init(); // load data from new file or create new data file if none exists
 
                     writer.FileChange(oldPath, dataPath);
-
-                    //if (! LoadData())
-                    //    writer.Log(LogType.Error, "loading data failed");
                 }
             }
         }
 
         public Reminder[] Reminders
         {
-            get => reminders; //loaddata in get so program is always uptodate with file? or not necessary cuz file should only be changed with program?
+            get => reminders;
             set
             {
                 if (value != reminders)

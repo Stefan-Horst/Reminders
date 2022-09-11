@@ -61,45 +61,15 @@ namespace Reminders
         }
 
         // updates date of reminder to next date if repeat is enabled
-        public void SetReminderToNextDate(int id) // user of this method must then update reminders in filemanager
+        private void SetReminderToNextDate(int id) // user of this method must then update reminders in filemanager
         {
             Reminder r = ReadReminder(id);
             
             if (r.Repeat != "0")
             {
-                ConverterFormatter.StandardizeTimespan(r.Repeat, out int time, out string unit); //either here or somewhere else try catch needed
+                ConverterFormatter.StandardizeTimespan(r.Repeat, out int time, out string unit);
 
                 unit = unit.Replace("s", "");
-                
-                /*if (unit == "minute")
-                {
-                    r.Date = r.Date.AddMinutes(time);
-                }
-                else if (unit == "hour")
-                {
-                    r.Date = r.Date.AddHours(time);
-                }
-                else if (unit == "day")
-                {
-                    r.Date = r.Date.AddDays(time);
-                }
-                else if (unit == "week")
-                {
-                    r.Date = r.Date.AddDays(time * 7);
-                }
-                else if (unit == "month")
-                {
-                    r.Date = r.Date.AddMonths(time);
-                }
-                else if (unit == "year")
-                {
-                    r.Date = r.Date.AddYears(time);
-                }
-                else
-                {
-                    writer.Log(LogType.Error, "set reminder to next date failed");
-                    return;
-                }*/
 
                 r.Date = ConverterFormatter.AddTimespanToDateTime(time, unit, r.Date);
                 
@@ -153,8 +123,7 @@ namespace Reminders
         
                             if (fileMgr.Notification == true)
                             {
-                                NotificationWindow notification = new NotificationWindow();
-                                notification.Display("A reminder is due!"); // show notification window
+                                NotificationWindow.Display("A reminder is due!"); // show notification window
                             }
         
                             return writer.DueReminders(rmdrs);
@@ -183,8 +152,6 @@ namespace Reminders
             foreach (Reminder r in reminders)
             {
                 //first checks if r will be due not after the end date, then checks if r will be due after the start date
-                //Console.WriteLine(r.Date.ToLongTimeString()+" "+end.ToLongTimeString());
-                //Console.WriteLine(GetRemainingTime(r.Id, end.Date) + " " + GetRemainingTime(r.Id, start.Date));
                 if (GetRemainingTime(r.Id, end) <= TimeSpan.Zero && GetRemainingTime(r.Id, start) >= TimeSpan.Zero)
                 {
                     rmndrs.Add(r);
@@ -195,7 +162,6 @@ namespace Reminders
         }
 
         // checks if any reminders are due at a certain date and returns them
-        //maybe differentiation between due and overdue reminders necessary
         public List<Reminder> GetDueReminders(DateTime dueDate)
         {
             List<Reminder> rmndrs = new List<Reminder>();
@@ -220,7 +186,6 @@ namespace Reminders
         public TimeSpan GetRemainingTime(int id, DateTime dateToCompare)
         {
             DateTime dt = ReadReminder(id).Date;
-            //Console.WriteLine(dt.ToString()+"-"+dateToCompare.ToString()+"="+dt.Subtract(dateToCompare)); always absolute number
             return dt.Subtract(dateToCompare);
         }
 
@@ -242,13 +207,6 @@ namespace Reminders
         public int CreateReminder(string dateString, string repeat, string content)
         {
             Reminder r = new Reminder(dateString, repeat, content);
-
-            /*if(r.Date == null) //maybe add more checks for errors, SHOULD BE NULL OR THROW EXC IN REMINDER?
-            {
-                Console.WriteLine("ERROR"); //todo use outputwriter
-                //return false;
-                throw new FormatException("Parameter \"dateString\"(" + dateString + ") has invalid format.");
-            }*/
 
             r.Id = idIterator;
             idIterator++;

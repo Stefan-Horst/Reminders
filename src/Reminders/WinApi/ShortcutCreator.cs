@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Reminders.WinApi
 {
-    public class ShortcutCreator
+    public static class ShortcutCreator
     {
-        public void CreateShortcut(string path, string filename)
+        public static void CreateShortcut(string path, string filename)
         {
             IShellLink link = (IShellLink) new ShellLink();
 

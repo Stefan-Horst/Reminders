@@ -17,7 +17,7 @@ namespace Reminders
         Info
     }
     
-    public class OutputTextWriter //call class "outputtext"?
+    public class OutputTextWriter
     {
         private SimulConsoleIO simio;
 
@@ -158,13 +158,6 @@ namespace Reminders
             simio.WriteLine("\t" + value);
         }
 
-        // only show upcoming reminders like in the welcome message
-        /*public void ShowUpcomingReminders(int days, string reminders)
-        {
-            simio.WriteLine("Reminders for the next " + converter.FormatTime(days) + ":");
-            simio.WriteLine(GetUpcomingRemindersRaw(reminders));
-        }*/
-
         public string DueReminders(List<Reminder> rmdrs) // cant print here because need to be printed from outputwriter
         {
             string s;
@@ -181,7 +174,7 @@ namespace Reminders
             {
                 s = Environment.NewLine + " ========================= Due Reminders: =========================" + Environment.NewLine;
 
-                s += ListReminders(rmdrs) + Environment.NewLine;
+                s += ListReminders(rmdrs);
                 
                 s += " ==================================================================" + Environment.NewLine;
             }
@@ -254,10 +247,7 @@ namespace Reminders
                     if (reminderStartTotalLength + content.Length > Console.BufferWidth && !(reminderStartTotalLength + content.Length - r.Content.Length > Console.BufferWidth))
                     {
                         s = s.Remove(Console.BufferWidth - reminderStartTotalLength - 1); // trim content so that each reminder is not longer than one line in console
-
-                        //if (ReminderStartText.Contains("\t"))
-                        //    s = s.Remove(s.Length - TabLength);
-
+                        
                         s += "...";
                     }
                     content += s + Environment.NewLine;
@@ -273,40 +263,18 @@ namespace Reminders
             string read = r.Read == true ? "yes" : "no";
             string output = ReminderStartText + "Id: " + r.Id + ", Date: " + r.Date.ToShortDateString() + " " + r.Date.ToShortTimeString() + ", Repeat: " + r.Repeat + ", Read: " + read + Environment.NewLine;
             
-            /*if (ReminderStartText.Length + s.Length + r.Content.Length > Console.BufferWidth && !(ReminderStartText.Length + s.Length - r.Content.Length > Console.BufferWidth))
-            {
-                s = s.Remove(Console.BufferWidth - ReminderStartText.Length - 4); // trim content so that each reminder is not longer than one line in console
-
-                if (ReminderStartText.Contains("\t"))
-                    s = s.Remove(s.Length - TabLength);
-
-                s += "...";
-            }
-            else
-            {
-                s += r.Content;
-            }*/
-            string lineStart = "Content: ";
+            const string lineStart = "Content: ";
             string content = new string(' ', reminderStartTotalLength) + lineStart + r.Content;
             
-            //if (reminderStartTotalLength + r.Content.Length > Console.BufferWidth) // split output over multiple lines with indentation in each line
-            //{
-                while (content.Length / Console.BufferWidth > 0)
-                {
-                    output += content.Remove(Console.BufferWidth - 2) + Environment.NewLine;
-
-                    content = new string(' ', reminderStartTotalLength + lineStart.Length) + content[(Console.BufferWidth - 2)..];
-                }
-
-                //if (content.Length > reminderStartTotalLength)
-                    output += content;
-                
-                return output;
-            /*}
-            else
+            while (content.Length / Console.BufferWidth > 0)
             {
-                return output + content;
-            }*/
+                output += content.Remove(Console.BufferWidth - 2) + Environment.NewLine;
+
+                content = new string(' ', reminderStartTotalLength + lineStart.Length) + content[(Console.BufferWidth - 2)..];
+            }
+            output += content;
+            
+            return output;
         }
 
         public void FileChange(string oldPath, string newPath)
