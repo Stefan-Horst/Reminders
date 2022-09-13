@@ -15,15 +15,15 @@ namespace Reminders
         private const string ConfigText = "path=default;\n" +
                                           "autostart=false;\n" +
                                           "upcomingreminderstime=3;\n" +
-                                          "devmode=false\n" +
-                                          "notification=true\n" +
-                                          "quickedit=false";
+                                          "devmode=false;\n" +
+                                          "notification=true;\n" +
+                                          "quickedit=false;";
         private const int NumRmdrParams = 4;
         private const string AutostartFilename = "Reminders";
 
         private OutputTextWriter writer;
 
-        private readonly string appPath = AppDomain.CurrentDomain.BaseDirectory; // config.txt is always saved here
+        private readonly string appPath = Environment.CurrentDirectory; // config.txt is always saved here
         private string dataPath; // path where data.rmdr is saved
         private string dataFilename = "data.rmdr";
         private int upcomingDays;
@@ -39,26 +39,37 @@ namespace Reminders
             Init();
         }
 
-        private void Init()
+        private void Init(string oldDataPath = "") // oldDataPath used to reset dataPath when init is called by updating dataPath and path is wrong
         {
             dataPath = appPath;
             
-            if (! LoadConfig())
+            if (!LoadConfig())
             {
-                 writer.Log(LogType.Problem, "loading config failed, proceeding with default settings");
-                            
-                 if (! RestoreConfigToDefault())
-                     writer.Log(LogType.ErrorCritical, "restoring config failed");
-            }
+                writer.Log(LogType.Problem, "loading config failed, proceeding with default settings");
 
+                if (!RestoreConfigToDefault())
+                    writer.Log(LogType.ErrorCritical, "restoring config to default failed");
+                
+                if (!LoadConfig())
+                    writer.Log(LogType.ErrorCritical, "loading config failed");
+            }
+            
             if (! LoadData())
             {
-                writer.Log(LogType.Error, "loading data failed");
-
+                writer.Log(LogType.Problem, "loading data failed, proceeding with new empty data file");
+                
                 if (! File.Exists(appPath + dataFilename))
                 {
-                    if (! SaveData()) // creates new empty data file
+                    if (! SaveFile(dataPath, dataFilename, "")) // creates new empty data file
+                    {
+                        if (oldDataPath != "")
+                        {
+                            dataPath = oldDataPath;
+                            SaveConfig();
+                        }
+                        
                         writer.Log(LogType.ErrorCritical, "creating data file failed");
+                    }
                     
                     if (! LoadData())
                         writer.Log(LogType.ErrorCritical, "loading data failed");
@@ -77,9 +88,12 @@ namespace Reminders
 
             if (! LoadFile(appPath, ConfigFile, out string fileRaw))
             {
-                writer.Log(LogType.Error, "loading config file failed");
+                if (File.Exists(Path.Combine(appPath, ConfigFile)))
+                    writer.Log(LogType.Error, "loading config file failed");
+                
                 return false;
             }
+            writer.Log(LogType.Info, "file loaded successfully: " + Path.Combine(appPath, ConfigFile));
 
             fileRaw = Regex.Replace(fileRaw, @"\t|\n|\r", ""); //remove all newlines and tabs
             string[] lines = fileRaw.Split(';');
@@ -127,7 +141,7 @@ namespace Reminders
                 error = true;
             }
 
-            writer.Log(LogType.Info, "file loaded successfully: " + ConfigFile); // first info log only possible after devmode init
+            writer.Log(LogType.Info, "file loaded successfully: " + Path.Combine(appPath, ConfigFile)); // first info log only possible after devmode init
             writer.Log(LogType.Info, "devmode: " + writer.Devmode);
             
             // param: path; allowed values: "default" or any file path
@@ -237,7 +251,7 @@ namespace Reminders
             bool b = SaveFile(appPath, ConfigFile, ConfigText);
 
             if (b)
-                writer.Log(LogType.Info, "file saved successfully: " + ConfigFile);
+                writer.Log(LogType.Info, "file saved successfully: " + Path.Combine(appPath, ConfigFile));
             
             return b;
         }
@@ -256,7 +270,7 @@ namespace Reminders
             if (! SaveFile(appPath, ConfigFile, configText))
                 writer.Log(LogType.Error, "saving config failed");
             else
-                writer.Log(LogType.Info, "file saved successfully: " + ConfigFile);
+                writer.Log(LogType.Info, "file saved successfully: " + Path.Combine(appPath, ConfigFile));
         }
 
         private bool LoadData()
@@ -265,7 +279,9 @@ namespace Reminders
 
             if (! LoadFile(dataPath, dataFilename, out string fileRaw))
             {
-                writer.Log(LogType.Error, "loading data failed");
+                if (File.Exists(Path.Combine(dataPath, dataFilename)))
+                    writer.Log(LogType.Error, "loading data failed");
+                
                 return false;
             }
             writer.Log(LogType.Info, "data file loaded successfully: " + dataFilename);
@@ -301,7 +317,7 @@ namespace Reminders
 
             if (values.Length % NumRmdrParams != 0) //+1 for the extra line which is removed next
             {
-                writer.Log(LogType.ErrorCritical, "wrong amount of params in data");
+                writer.Log(LogType.ErrorCritical, "wrong amount of parameters in data file");
                 return false;
             }
 
@@ -425,7 +441,7 @@ namespace Reminders
             {
                 if (value != dataPath)
                 {
-                    if (!SaveData())
+                    if (! SaveData())
                     {
                         writer.Log(LogType.Error, "saving data failed");
                         return;
@@ -433,7 +449,7 @@ namespace Reminders
 
                     string oldPath = dataPath;
                     
-                    if (value == "default")
+                    if (value == "default" || value == "Default")
                         dataPath = appPath;
                     else
                         dataPath = value;
@@ -441,8 +457,8 @@ namespace Reminders
                     SaveConfig();
 
                     reminders = Array.Empty<Reminder>();
-                    Init(); // load data from new file or create new data file if none exists
-
+                    Init(oldPath); // load data from new file or create new data file if none exists
+                    
                     writer.FileChange(oldPath, dataPath);
                 }
             }
