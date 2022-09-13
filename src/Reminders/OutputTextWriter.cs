@@ -199,7 +199,8 @@ namespace Reminders
                     simio.WriteLine(logStartText + "[CRITICAL ERROR] " + info);
                     simio.WriteLine(logStartText + "THIS ERROR PREVENTS THE PROGRAM FROM WORKING, PLEASE RESTART OR TROUBLESHOOT");
                     simio.WriteLine(logStartText + "press any button to exit...");
-                    simio.ReadLine();
+                    simio.ForcePrintQueue();
+                    Console.ReadKey();
                     Environment.Exit(-1);
                     break;
                 case LogType.ErrorEx:
