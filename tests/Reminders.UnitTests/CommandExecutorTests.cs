@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -11,7 +10,7 @@ namespace Reminders.UnitTests
     [TestClass]
     public class CommandExecutorTests
     {
-        private const string TEST_DATE = "201220400101";
+        private const string TestDate = "201220400101";
         
         private CommandExecutor ce;
         private ReminderManager rm;
@@ -100,7 +99,7 @@ namespace Reminders.UnitTests
         [TestMethod]
         public void CmdDelete_StandardBehaviour()
         {
-            int id = rm.CreateReminder(TEST_DATE, "0", "reminder 1");
+            int id = rm.CreateReminder(TestDate, "0", "reminder 1");
             ce.Execute("delete " + id);
 
             int ie = 0;
@@ -112,7 +111,7 @@ namespace Reminders.UnitTests
         [TestMethod]
         public void CmdUpdate_DateParam_StandardBehaviour()
         {
-            int id = rm.CreateReminder(TEST_DATE, "0", "reminder 1");
+            int id = rm.CreateReminder(TestDate, "0", "reminder 1");
             ce.Execute("update " + id + " 01.01.2022");
 
             string se = "01.01.2022 01:01 0 reminder 1";
@@ -124,7 +123,7 @@ namespace Reminders.UnitTests
         [TestMethod]
         public void CmdUpdate_ShortDateParam_StandardBehaviour()
         {
-            int id = rm.CreateReminder(TEST_DATE, "0", "reminder 1");
+            int id = rm.CreateReminder(TestDate, "0", "reminder 1");
             ce.Execute("update " + id + " 010122");
 
             string se = "01.01.2022 01:01 0 reminder 1";
@@ -136,7 +135,7 @@ namespace Reminders.UnitTests
         [TestMethod]
         public void CmdUpdate_TimeParam_StandardBehaviour()
         {
-            int id = rm.CreateReminder(TEST_DATE, "0", "reminder 1");
+            int id = rm.CreateReminder(TestDate, "0", "reminder 1");
             ce.Execute("update " + id + " 23:59");
 
             string se = "20.12.2040 23:59 0 reminder 1";
@@ -148,7 +147,7 @@ namespace Reminders.UnitTests
         [TestMethod]
         public void CmdUpdate_ShortTimeParam_StandardBehaviour()
         {
-            int id = rm.CreateReminder(TEST_DATE, "0", "reminder 1");
+            int id = rm.CreateReminder(TestDate, "0", "reminder 1");
             ce.Execute("update " + id + " 100");
 
             string se = "20.12.2040 01:00 0 reminder 1";
@@ -160,7 +159,7 @@ namespace Reminders.UnitTests
         [TestMethod]
         public void CmdUpdate_RepeatParam_StandardBehaviour()
         {
-            int id = rm.CreateReminder(TEST_DATE, "0", "reminder 1");
+            int id = rm.CreateReminder(TestDate, "0", "reminder 1");
             ce.Execute("update " + id + " 10day");
 
             string se = "20.12.2040 01:01 10days reminder 1";
@@ -172,7 +171,7 @@ namespace Reminders.UnitTests
         [TestMethod]
         public void CmdUpdate_ShortRepeatParam_StandardBehaviour()
         {
-            int id = rm.CreateReminder(TEST_DATE, "0", "reminder 1");
+            int id = rm.CreateReminder(TestDate, "0", "reminder 1");
             ce.Execute("update " + id + " 1d");
 
             string se = "20.12.2040 01:01 1day reminder 1";
@@ -184,7 +183,7 @@ namespace Reminders.UnitTests
         [TestMethod]
         public void CmdUpdate_SingleContentParam_StandardBehaviour()
         {
-            int id = rm.CreateReminder(TEST_DATE, "0", "reminder 1");
+            int id = rm.CreateReminder(TestDate, "0", "reminder 1");
             ce.Execute("update " + id + " text");
 
             string se = "20.12.2040 01:01 0 text";
@@ -196,7 +195,7 @@ namespace Reminders.UnitTests
         [TestMethod]
         public void CmdUpdate_ContentParam_StandardBehaviour()
         {
-            int id = rm.CreateReminder(TEST_DATE, "0", "reminder 1");
+            int id = rm.CreateReminder(TestDate, "0", "reminder 1");
             ce.Execute("update " + id + " here comes the text");
 
             string se = "20.12.2040 01:01 0 here comes the text";

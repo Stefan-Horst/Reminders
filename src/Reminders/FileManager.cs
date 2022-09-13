@@ -23,7 +23,7 @@ namespace Reminders
 
         private OutputTextWriter writer;
 
-        private readonly string appPath = Environment.CurrentDirectory; // config.txt is always saved here
+        private readonly string appPath = Environment.CurrentDirectory; // directory of .exe file, config.txt is always saved here
         private string dataPath; // path where data.rmdr is saved
         private string dataFilename = "data.rmdr";
         private int upcomingDays;
