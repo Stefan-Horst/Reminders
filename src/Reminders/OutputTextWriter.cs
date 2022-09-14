@@ -57,9 +57,14 @@ namespace Reminders
 
         public void ShowWelcomeReminders(int days, List<Reminder> rmdrs)
         {
-            if (rmdrs.Count == -1)
+            if (days == -1)
             {
                 simio.WriteLine(" Here are all upcoming reminders:");
+                PrintRemindersList(rmdrs);
+            }
+            else if (days == 0)
+            {
+                simio.WriteLine(" Here are all reminders for today:");
                 PrintRemindersList(rmdrs);
             }
             else if (rmdrs.Count > 0)
@@ -148,8 +153,7 @@ namespace Reminders
                             "\tdevMode = " + devmode + Environment.NewLine +
                             "\tnotification = " + notification + Environment.NewLine +
                             "\tquickEdit = " + quickedit + Environment.NewLine +
-                            " (You can also change these values in the config.txt file. " + Environment.NewLine +
-                            "  A restart of this program will be needed for some of them to take effect)");
+                            " (You can also change these values in the config.txt file. ");
         }
 
         public void EditConfig(string value)
