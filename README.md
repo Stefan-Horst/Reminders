@@ -3,6 +3,8 @@
 It is feature-rich while being lightweight, not relying on any external libraries. 
 Reminders also has the unique feature of printing due reminders in the console while the user is typing something at the same time.
 
+<img alt="Program screenshot" src="screenshot.png" title="Screenshot">
+
 ## Features
 - Create, read, update and delete reminders
 - Due reminders will be immediately shown in the console - even if you are typing at that exact moment. Alternatively, a notification pop-up window can be shown
