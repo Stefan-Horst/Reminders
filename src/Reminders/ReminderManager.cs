@@ -80,12 +80,13 @@ namespace Reminders
         // marks reminders as read / not read
         public void MarkReminder(int id, bool read)
         {
-            ReadReminder(id).Read = read;
+            Reminder r = ReadReminder(id);
+            r.Read = read;
 
-            if (read == true)
+            if (read == true && r.Repeat != "0")
             {
                 SetReminderToNextDate(id);
-                ReadReminder(id).Read = false;
+                r.Read = false;
             }
             
             fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
