@@ -14,7 +14,8 @@ namespace Reminders.WinApi
 
             // setup shortcut information
             link.SetDescription("Startup Folder Shortcut for Reminders Application");
-            link.SetPath(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            link.SetPath(Path.Combine(Environment.CurrentDirectory, filename));
+            link.SetWorkingDirectory(Environment.CurrentDirectory);
 
             // save it
             IPersistFile file = (IPersistFile) link;

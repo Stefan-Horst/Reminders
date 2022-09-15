@@ -153,7 +153,7 @@ namespace Reminders
                             "\tdevMode = " + devmode + Environment.NewLine +
                             "\tnotification = " + notification + Environment.NewLine +
                             "\tquickEdit = " + quickedit + Environment.NewLine +
-                            " (You can also change these values in the config.txt file. ");
+                            " (You can also change these values in the config.txt file.)");
         }
 
         public void EditConfig(string value)
