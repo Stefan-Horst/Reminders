@@ -250,9 +250,8 @@ namespace Reminders
                         return;
                     }
                     reminderMgr.UpdateReminder(r.Id, r);
-                    
-                    writer.UpdateReminder(rClone, r);
                 }
+                writer.UpdateReminder(rClone, r);
             }
             catch (Exception ex)
             {

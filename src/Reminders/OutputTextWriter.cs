@@ -235,8 +235,6 @@ namespace Reminders
         
         private string ListReminders(List<Reminder> rmdrs)
         {
-            string output = "";
-            
             if (rmdrs.Count > 0)
             {
                 int maxRepeatLength = rmdrs.Max(r => r.Repeat.Length);
@@ -246,10 +244,11 @@ namespace Reminders
                 foreach (Reminder r in rmdrs)
                 {
                     string read = r.Read == true ? "yes," : "no, ";
+                    
                     // equal formatting for every reminder
                     string s = ReminderStartText + "Id: " + r.Id + new string(' ', maxIdLength - r.Id.ToString().Length) + ", " + r.Date.ToShortDateString() + " " + r.Date.ToShortTimeString() + ", Rpt: " + r.Repeat + "," + new string(' ', maxRepeatLength - r.Repeat.Length) + " Rd: " + read + " Cnt: " + r.Content;
 
-                    if (reminderStartTotalLength + content.Length > Console.BufferWidth && !(reminderStartTotalLength + content.Length - r.Content.Length > Console.BufferWidth))
+                    if (reminderStartTotalLength + s.Length > Console.BufferWidth && !(reminderStartTotalLength + s.Length - r.Content.Length > Console.BufferWidth))
                     {
                         s = s.Remove(Console.BufferWidth - reminderStartTotalLength - 1); // trim content so that each reminder is not longer than one line in console
                         
@@ -257,10 +256,10 @@ namespace Reminders
                     }
                     content += s + Environment.NewLine;
                 }
+                
                 return content;
             }
-
-            return output;
+            return "";
         }
         
         private string PrintReminder(Reminder r)
