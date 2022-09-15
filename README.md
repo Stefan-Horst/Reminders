@@ -8,6 +8,7 @@ Reminders also has the unique feature of printing due reminders in the console w
 ## Features
 - Create, read, update and delete reminders
 - Due reminders will be immediately shown in the console - even if you are typing at that exact moment. Alternatively, a notification pop-up window can be shown
+- Create repeating reminders that can be shown every day, week, month, etc.
 - Clean, structured and tidy text interface
 - Update only certain properties of reminders or directly edit their text, directly in the console
 - List reminders for all kinds time intervals or search for multiple terms by using powerful parameter options
@@ -28,7 +29,7 @@ Here is a list of all available commands, their parameters and descriptions:
 <details><summary>List of commands</summary>
 
 - `create` date time timespan content
-  - creates a new reminder with mandatory and optional values, then shows its id
+  - creates a new reminder with mandatory (date, content) and optional values, then shows its id; timespan specifies how long until the reminder will be repeated
 - `delete` id
   - deletes a reminder permanently by id
 - `update` id date time timespan content
@@ -36,7 +37,7 @@ Here is a list of all available commands, their parameters and descriptions:
 - `edit` id
   - you can directly edit the content text of the reminder, press enter to save it
 - `read` id
-  - marks a reminder as read so it does not pop up as due every time the program is started
+  - marks a reminder as read so it does not pop up as due every time the program is started; repeating reminders will instead be set to their next date and marked as unread again
 - `show` id / status startdate enddate / date / timespan
   - shows either the complete details of one reminder by id or a list of reminders defined by a date, between two dates or in a timespan from now
 - `search` terms
