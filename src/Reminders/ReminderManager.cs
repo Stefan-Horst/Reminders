@@ -110,7 +110,7 @@ namespace Reminders
                         if (rmdrs.Count > 0)
                         {
                             shownReminders.AddRange(rmdrs.Select(r => r.Id).ToList());
-                                                
+                            
                             foreach (int id in shownReminders)
                             {
                                 if (ReadReminder(id).Read == true)
@@ -226,6 +226,7 @@ namespace Reminders
             {
                 reminders.RemoveAt(i);
                 fileMgr.Reminders = reminders.ToArray(); //filemgr then updates savefile
+                shownReminders.Remove(id);
             }
             else
             {

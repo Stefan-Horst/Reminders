@@ -13,11 +13,11 @@ namespace Reminders
         private const string ConfigFile = "config.txt";
         private const int NumConfigArgs = 6;
         private const string ConfigText = "path=default;\n" +
-                                          "autostart=false;\n" +
-                                          "upcomingreminderstime=3;\n" +
-                                          "devmode=false;\n" +
-                                          "notification=true;\n" +
-                                          "quickedit=false;";
+                                          "autostart=False;\n" +
+                                          "upcomingreminderstime=7;\n" +
+                                          "devmode=False;\n" +
+                                          "notification=True;\n" +
+                                          "quickedit=False;";
         private const int NumRmdrParams = 4;
         private const string AutostartFilename = "Reminders";
 
